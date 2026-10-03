@@ -21,7 +21,6 @@ public class DemoApplication  implements CommandLineRunner {
 		SpringApplication.run(DemoApplication.class, args);
 	}
 
-
 	@Override
 	public void run(String... args) throws Exception {
 

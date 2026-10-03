@@ -49,6 +49,7 @@ public class PopulatorDB {
                 .build();
     }
 
+
     public List<RoadMap> createRoadmaps() {
         List<RoadMap> roadmaps = new ArrayList<>();
         roadmaps.add(new RoadMap("DDD Mastery", "Domain-Driven Design deep dive", 8, false));

@@ -24,4 +24,5 @@ public enum ProfileType {
         System.out.printf( "║ Focus:   %-55s║%n", focus);
         System.out.println("╚═════════════════════════════════════════════════════════════════╝");
     }
+
 }

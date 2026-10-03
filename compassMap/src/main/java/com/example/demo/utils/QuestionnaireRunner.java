@@ -22,6 +22,7 @@ public class QuestionnaireRunner {
         int knowsCode = 0;
         int wantsToLearn = 0;
 
+
         for (int i = 0; i < questions.length; i++) {
             System.out.print(questions[i] + " ");
             String answer = scan.nextLine().trim().toLowerCase();

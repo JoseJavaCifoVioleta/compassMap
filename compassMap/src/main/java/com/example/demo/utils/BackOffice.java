@@ -141,7 +141,6 @@ public class BackOffice {
             }
         }
     }
-
     /*
     public static void customerLoop(Scanner scan, PopulatorDB populatorDB, CustomerService customerService) {
         boolean inCustomerMenu = true;
