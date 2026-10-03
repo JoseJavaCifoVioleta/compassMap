@@ -26,6 +26,10 @@ public class CustomerService {
         return createdCustomer;
     }
 
+    public Iterable<Customer> findAll() {
+        return customerRepository.findAll();
+    }
+
     public void deleteCustomer (String id){
 
       customerRepository.deleteById(id);

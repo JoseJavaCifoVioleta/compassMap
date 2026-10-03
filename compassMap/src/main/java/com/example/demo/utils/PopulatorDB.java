@@ -49,6 +49,14 @@ public class PopulatorDB {
                 .build();
     }
 
+    public List<RoadMap> createRoadmaps() {
+        List<RoadMap> roadmaps = new ArrayList<>();
+        roadmaps.add(new RoadMap("DDD Mastery", "Domain-Driven Design deep dive", 8, false));
+        roadmaps.add(new RoadMap("AI Shipping", "LLM tools for rapid delivery", 5, false));
+        roadmaps.add(new RoadMap("Code Foundations", "Variables, loops, functions", 12, false));
+        roadmaps.add(new RoadMap("Tech Literacy", "Architecture for non-devs", 4, true));
+        return roadmaps;
+    }
 
 
 }
