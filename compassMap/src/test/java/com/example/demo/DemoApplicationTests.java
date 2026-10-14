@@ -143,13 +143,29 @@ class DemoApplicationTests {
 		// 1. Validamos que el componente está bien construido
 		assertNotNull(customerWebController);
 
-		// 2. Simulamos la llamada a la página pasando una maleta vacía de prueba
+		// 2. Simulamos la llamada a la página pasando la página 0, tamaño 10 y la maleta de prueba
 		org.springframework.ui.ExtendedModelMap maletaPrueba = new org.springframework.ui.ExtendedModelMap();
-		String nombrePlantilla = customerWebController.showCustomersPage(maletaPrueba);
 
-		// 3. Verificamos que el cartero apunta exactamente al archivo HTML "customers"
+		// ACTUALIZADO: Añadimos el '0, 10, ' antes de la maleta para cumplir con la nueva estructura
+		String nombrePlantilla = customerWebController.showCustomersPage(0, 10, maletaPrueba);
+
+		// 3. Verifica que el cartero apunta exactamente al archivo HTML "customers"
 		org.junit.jupiter.api.Assertions.assertEquals("customers", nombrePlantilla);
 		System.out.println("Laboratorio: Ruta web verificada. El controlador conecta con: " + nombrePlantilla + ".html");
+	}
+
+	// Prueba 7: Verificación del motor de paginación segmentada del archivador
+	@Test
+	void testCustomerPagingLoot() {
+		System.out.println("Laboratorio: Verificando división en páginas de la base de datos...");
+
+		// Solicitamos un bloque artificial de tamaño 5
+		org.springframework.data.domain.Pageable controlPagina = org.springframework.data.domain.PageRequest.of(0, 5);
+		org.springframework.data.domain.Page<Customer> resultadoBloque = customerService.findAllPaginated(controlPagina);
+
+		// Validamos que el envoltorio del bloque de Spring Boot no es nulo
+		assertNotNull(resultadoBloque);
+		System.out.println("Laboratorio: Motor de paginación respondiendo con éxito.");
 	}
 
 }

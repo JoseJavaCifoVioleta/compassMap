@@ -69,4 +69,10 @@ public class CustomerService {
         return customerRepository.count();
     }
 
+    // Acción: Consultar un bloque o "página" específica de clientes (ej. de 10 en 10) (paginación).
+    // Esto evita saturar la pantalla con 1000 registros de golpe.
+    public org.springframework.data.domain.Page<Customer> findAllPaginated(org.springframework.data.domain.Pageable pageable) {
+        // Le pide al archivador automático que solo traiga el pedazo de fichas solicitado.
+        return customerRepository.findAll(pageable);
+    }
 }
