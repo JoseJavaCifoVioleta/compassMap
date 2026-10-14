@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>CompassMap - Editar Cliente</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f4f7f6; color: #333; }
+        .form-container { max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        h1 { color: #2c3e50; border-bottom: 2px solid #f39c12; padding-bottom: 8px; margin-top: 0; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #34495e; }
+        input[type="text"], input[type="email"] { width: 95%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 12px; }
+        .btn-save { width: 100%; padding: 12px; background-color: #f39c12; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+        .btn-cancel { display: block; text-align: center; margin-top: 15px; color: #7f8c8d; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h1>✏️ Modificar Ficha de Cliente</h1>
+    <p>Edita los campos necesarios. Al guardar, el archivador actualizará los datos sobre el mismo registro sin duplicarlo.</p>
+
+    <!-- Reutilizamos la ruta de guardado. Como la ficha incluye el ID oculto, JPA sabe que debe actualizar en vez de crear -->
+    <form th:action="@{/customers/save}" th:object="${clienteAEditar}" method="POST">
+
+        <!-- Campo oculto para conservar el ID único original del cliente sin que se modifique -->
+        <input type="hidden" th:field="*{id}" />
+
+        <label>Nombre:</label>
+        <input type="text" th:field="*{firstName}" required />
+
+        <label>Apellido:</label>
+        <input type="text" th:field="*{lastName}" required />
+
+        <label>Correo Electrónico:</label>
+        <input type="email" th:field="*{email}" required />
+
+        <label>Teléfono:</label>
+        <input type="text" th:field="*{phone}" />
+
+        <label>Dirección Postal:</label>
+        <input type="text" th:field="*{address}" />
+
+        <button type="submit" class="btn-save">💾 Guardar Cambios Realizados</button>
+        <a href="/customers" class="btn-cancel">❌ Cancelar y Volver Atrás</a>
+    </form>
+</div>
+
+</body>
+</html>

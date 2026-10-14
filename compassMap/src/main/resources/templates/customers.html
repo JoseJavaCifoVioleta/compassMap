@@ -1,68 +1,92 @@
 <!DOCTYPE html>
-<!-- Indicamos a la página que va a usar el motor de traducción de Spring (Thymeleaf) -->
 <html xmlns:th="http://thymeleaf.org" lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CompassMap - Panel de Clientes</title>
     <style>
-        /* Estilos básicos provisionales para que tus compañeros lo vean todo ordenado */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f4f7f6; color: #333; }
-        h1 { color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #34495e; color: white; }
-        tr:hover { background-color: #f5f5f5; }
-        .info-vacia { padding: 20px; background-color: #eaf2f8; color: #2980b9; border-radius: 4px; margin-top: 20px; }
+        /* ESTILOS DE CONTROL LOCAL: Carga instantánea y diseño limpio */
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .wrapper { max-width: 1300px; margin: 0 auto; }
+        .card-contenedor { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 25px; border: 1px solid #e1e8ed; }
+        h1 { color: #2c3e50; margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid #00b4d8; font-size: 1.8rem; }
+
+        /* Buscador adaptativo */
+        .search-form { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
+        .search-form input { flex: 1; min-width: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95rem; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; font-size: 0.95rem; }
+        .btn-info { background-color: #00b4d8; color: white; }
+        .btn-secondary { background-color: #7f8c8d; color: white; }
+        .btn-warning { background-color: #f39c12; color: white; }
+        .btn-danger { background-color: #e74c3c; color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+
+        /* Contenedor Adaptativo Móvil para la Tabla */
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 6px; border: 1px solid #dee2e6; }
+        table { width: 100%; border-collapse: collapse; text-align: left; background: white; min-width: 900px; }
+        th, td { padding: 12px 15px; border-bottom: 1px solid #dee2e6; font-size: 0.9rem; }
+        th { background-color: #1c2541; color: white; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
+        tr:hover { background-color: #f8f9fa; }
+        .tabla-codigo { font-family: monospace; color: #7f8c8d; font-size: 0.8rem; }
+        .actions-cell { display: flex; gap: 6px; justify-content: center; }
     </style>
 </head>
 <body>
 
-<h1>🗺️ CompassMap - Gestión de Clientes</h1>
-<p>Bienvenido al panel visual de control. Aquí se muestran las fichas activas recuperadas en tiempo real de nuestro archivador digital.</p>
+<div class="wrapper">
+    <div class="card-contenedor">
+        <h1>🗺️ CompassMap - Gestión de Clientes</h1>
+        <p style="color: #666; margin: 0;">Bienvenido al panel visual de control. Las fichas se recuperan en tiempo real de nuestro archivador digital.</p>
+    </div>
 
-<!-- Control de seguridad: Si la maleta viene vacía y no hay clientes, mostramos este aviso -->
-<div class="info-vacia" th:if="${#lists.isEmpty(listaDeClientes)}">
-    <strong>Aviso:</strong> No hay clientes registrados actualmente en la base de datos. ¡Utiliza el semillero o el menú para añadir datos simulados!
+    <!-- CAJA DE BÚSQUEDA LOCAL -->
+    <div class="card-contenedor">
+        <form th:action="@{/customers}" method="GET" class="search-form">
+            <span style="font-weight: bold; color: #4e5d6c;">🔍 Buscar por nombre:</span>
+            <input type="text" name="buscarNombre" th:value="${textoBuscado}" placeholder="Escribe un nombre a localizar..."/>
+            <button type="submit" class="btn btn-info">Filtrar</button>
+            <a href="/customers" class="btn btn-secondary">Limpiar</a>
+        </form>
+    </div>
+
+    <!-- TABLA RESPONSIVA CORREGIDA: Exactamente 7 cabeceras alineadas con sus 7 columnas -->
+    <div class="card-contenedor" th:unless="${#lists.isEmpty(listaDeClientes)}">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                <tr>
+                    <th>Código Único (ID)</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Correo Electrónico</th>
+                    <th>Teléfono</th>
+                    <th>Dirección Postal</th>
+                    <th style="text-align: center;">Acciones Visuales</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="cliente : ${listaDeClientes}">
+                    <td th:text="${cliente.id}" class="tabla-codigo">Código</td>
+                    <td th:text="${cliente.firstName}" style="font-weight: bold; color: #1c2541;">Nombre</td>
+                    <td th:text="${cliente.lastName}">Apellido</td>
+                    <td th:text="${cliente.email}">Correo</td>
+                    <td th:text="${cliente.phone}">Teléfono</td>
+                    <td th:text="${cliente.address}">Dirección</td>
+                    <td>
+                        <div class="actions-cell">
+                            <a th:href="@{/customers/edit/{id}(id=${cliente.id})}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                            <a th:href="@{/customers/delete/{id}(id=${cliente.id})}"
+                               onclick="return confirm('¿Seguro que deseas eliminar permanentemente este registro?');"
+                               class="btn btn-danger btn-sm">🗑️ Eliminar</a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-<!-- CAJA DE BÚSQUEDA POR NOMBRE -->
-<div style="margin-bottom: 20px; background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-    <form th:action="@{/customers}" method="GET" style="display: flex; gap: 10px; align-items: center;">
-        <label style="font-weight: bold; color: #2c3e50;">🔍 Buscar por nombre:</label>
-        <input type="text" name="buscarNombre" th:value="${textoBuscado}" placeholder="Escribe un nombre..."
-               style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex-grow: 1;"/>
-        <button type="submit" style="padding: 8px 16px; background-color: #00b4d8; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Filtrar</button>
-        <a href="/customers" style="padding: 8px 16px; background-color: #7f8c8d; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">Limpiar</a>
-    </form>
-</div>
-
-
-<!-- Si la maleta contiene clientes, dibujamos la tabla automatizada -->
-<table th:unless="${#lists.isEmpty(listaDeClientes)}">
-    <thead>
-    <tr>
-        <th>Código Único (ID)</th>
-        <th>Nombre</th>
-        <th>Apellido</th>
-        <th>Correo Electrónico</th>
-        <th>Teléfono</th>
-        <th>Dirección Postal</th>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- El bucle 'th:each' es una fotocopiadora: agarra la maleta "listaDeClientes"
-         y genera automáticamente una fila de tabla (tr) por cada cliente individual -->
-    <tr th:each="cliente : ${listaDeClientes}">
-        <!-- Inyectamos dinámicamente el texto de cada propiedad en su casilla correspondiente -->
-        <td th:text="${cliente.id}" style="font-family: monospace; color: #7f8c8d;">Código</td>
-        <td th:text="${cliente.firstName}">Nombre</td>
-        <td th:text="${cliente.lastName}">Apellido</td>
-        <td th:text="${cliente.email}">Correo</td>
-        <td th:text="${cliente.phone}">Teléfono</td>
-        <td th:text="${cliente.address}">Dirección</td>
-    </tr>
-    </tbody>
-</table>
 <!-- BOTONERA DE PAGINACIÓN AUTOMÁTICA -->
 <div style="margin-top: 20px; text-align: center;">
     <!-- Botón para ir a la página anterior (se desactiva si estamos en la página 0) -->

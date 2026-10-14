@@ -70,4 +70,32 @@ public class CustomerWebController {
         // Redirigimos al usuario de vuelta a la lista para que vea su nuevo registro al instante
         return "redirect:/customers";
     }
+
+    // NUEVA ACCIÓN: Eliminar un cliente directamente haciendo clic en un enlace de la web
+    // Se activa al pulsar el botón "Eliminar" en la tabla: http://localhost:8080/customers/delete/un-id
+    @GetMapping("/customers/delete/{id}")
+    public String deleteCustomerFromWeb(@org.springframework.web.bind.annotation.PathVariable String id) {
+        System.out.println("Cartero Web: Procesando solicitud de baja visual para el código: " + id);
+
+        // Ordenamos al servicio que retire la ficha del archivador
+        customerService.deleteCustomer(id);
+
+        // Redirigimos de vuelta a la lista actualizada
+        return "redirect:/customers";
+    }
+
+    // NUEVA ACCIÓN: Abrir la pantalla con el formulario para modificar los datos de un cliente
+    // Se activa al pulsar el botón "Editar": http://localhost:8080/customers/edit/un-id
+    @GetMapping("/customers/edit/{id}")
+    public String showEditPage(@org.springframework.web.bind.annotation.PathVariable String id, Model model) {
+        System.out.println("Cartero Web: Abriendo la pantalla de edición para el código: " + id);
+
+        // Localizamos los datos actuales del cliente para meterlos en la maleta
+        Customer clienteExistente = customerService.getCustomerById(id);
+        model.addAttribute("clienteAEditar", clienteExistente);
+
+        // Viajamos a la nueva pantalla de edición
+        return "edit-customer";
+    }
+
 }
