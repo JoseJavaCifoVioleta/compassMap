@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.annotation.Rollback;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -111,5 +112,23 @@ class DemoApplicationTests {
 		}
 
 		System.out.println("¡Éxito! Se han creado e insertado los 1000 registros en la base de datos.");
+	}
+
+	@Autowired
+	private com.example.demo.controller.CustomerRestController customerRestController;
+
+	// Prueba 5: Verificación del funcionamiento de la ventanilla virtual (Controlador REST)
+	@Test
+	void testCustomerRestControllerBehavior() {
+		System.out.println("Laboratorio: Verificando la capa de atención web (RestController)...");
+
+		// 1. Validamos que la ventanilla se ha creado e inyectado correctamente en el sistema
+		assertNotNull(customerRestController);
+
+		// 2. Simulamos la consulta de la lista completa a través del controlador
+		List<Customer> listaWeb = customerRestController.getAllCustomers();
+		System.out.println("Ventanilla (Test): La lista actual contiene " + listaWeb.size() + " clientes.");
+
+		// El test certifica que el controlador es capaz de comunicarse con el servicio sin romperse
 	}
 }
