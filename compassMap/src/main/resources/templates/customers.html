@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!-- Indicamos a la página que va a usar el motor de traducción de Spring (Thymeleaf) -->
+<html xmlns:th="http://thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>CompassMap - Panel de Clientes</title>
+    <style>
+        /* Estilos básicos provisionales para que tus compañeros lo vean todo ordenado */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f4f7f6; color: #333; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #34495e; color: white; }
+        tr:hover { background-color: #f5f5f5; }
+        .info-vacia { padding: 20px; background-color: #eaf2f8; color: #2980b9; border-radius: 4px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<h1>🗺️ CompassMap - Gestión de Clientes</h1>
+<p>Bienvenido al panel visual de control. Aquí se muestran las fichas activas recuperadas en tiempo real de nuestro archivador digital.</p>
+
+<!-- Control de seguridad: Si la maleta viene vacía y no hay clientes, mostramos este aviso -->
+<div class="info-vacia" th:if="${#lists.isEmpty(listaDeClientes)}">
+    <strong>Aviso:</strong> No hay clientes registrados actualmente en la base de datos. ¡Utiliza el semillero o el menú para añadir datos simulados!
+</div>
+
+<!-- Si la maleta contiene clientes, dibujamos la tabla automatizada -->
+<table th:unless="${#lists.isEmpty(listaDeClientes)}">
+    <thead>
+    <tr>
+        <th>Código Único (ID)</th>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Correo Electrónico</th>
+        <th>Teléfono</th>
+        <th>Dirección Postal</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- El bucle 'th:each' es una fotocopiadora: agarra la maleta "listaDeClientes"
+         y genera automáticamente una fila de tabla (tr) por cada cliente individual -->
+    <tr th:each="cliente : ${listaDeClientes}">
+        <!-- Inyectamos dinámicamente el texto de cada propiedad en su casilla correspondiente -->
+        <td th:text="${cliente.id}" style="font-family: monospace; color: #7f8c8d;">Código</td>
+        <td th:text="${cliente.firstName}">Nombre</td>
+        <td th:text="${cliente.lastName}">Apellido</td>
+        <td th:text="${cliente.email}">Correo</td>
+        <td th:text="${cliente.phone}">Teléfono</td>
+        <td th:text="${cliente.address}">Dirección</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

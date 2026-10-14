@@ -131,4 +131,25 @@ class DemoApplicationTests {
 
 		// El test certifica que el controlador es capaz de comunicarse con el servicio sin romperse
 	}
+
+	@Autowired
+	private com.example.demo.controller.CustomerWebController customerWebController;
+
+	// Prueba 6: Verificación del comportamiento del cartero visual (Controlador Web)
+	@Test
+	void testCustomerWebControllerRoute() {
+		System.out.println("Laboratorio: Verificando la ruta del cartero visual (WebController)...");
+
+		// 1. Validamos que el componente está bien construido
+		assertNotNull(customerWebController);
+
+		// 2. Simulamos la llamada a la página pasando una maleta vacía de prueba
+		org.springframework.ui.ExtendedModelMap maletaPrueba = new org.springframework.ui.ExtendedModelMap();
+		String nombrePlantilla = customerWebController.showCustomersPage(maletaPrueba);
+
+		// 3. Verificamos que el cartero apunta exactamente al archivo HTML "customers"
+		org.junit.jupiter.api.Assertions.assertEquals("customers", nombrePlantilla);
+		System.out.println("Laboratorio: Ruta web verificada. El controlador conecta con: " + nombrePlantilla + ".html");
+	}
+
 }
