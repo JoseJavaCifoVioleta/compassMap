@@ -1,63 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
+	<!--
+	  El bloque 'parent' actúa como una "plantilla base" o "receta madre".
+	  Le dice a nuestro proyecto que herede todas las configuraciones estándar
+	  y versiones predefinidas por el profesor (versión 4.1.1) para que todo encaje sin sorpresas.
+	-->
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.1.1</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/> <!-- Busca la configuración en el almacén centralizado -->
 	</parent>
+
 	<groupId>com.example</groupId>
 	<artifactId>demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<name>compassMap</name>
+	<description>Proyecto de transicion de Java SE a Spring Boot - Version 1.1</description>
+
 	<properties>
+		<!-- Especificamos que el motor que leerá y ejecutará este código es Java 21 -->
 		<java.version>21</java.version>
 	</properties>
+
+	<!--
+	  El bloque 'dependencies' es nuestra "lista de la compra".
+	  Aquí declaramos las herramientas externas que nuestro programa necesita para funcionar.
+	-->
 	<dependencies>
+		<!-- Caja de herramientas para activar la interfaz visual de la base de datos H2 en el navegador -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-h2console</artifactId>
 		</dependency>
+
+		<!-- Herramienta para gestionar páginas pantallas web visuales (plantillas HTML) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
+
+		<!-- Activa el soporte para que el programa pueda recibir y responder peticiones a través de internet (Web) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
+
+		<!-- El "traductor automático" (JPA) que nos permite guardar objetos de Java en las tablas de la base de datos -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
+		<!-- Herramienta de desarrollo: reinicia el programa automáticamente cuando hacemos cambios en el código -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+
+		<!-- El motor de la base de datos física (H2). Funciona de forma interna y ligera dentro del proyecto -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
+		<!-- MEJORA INCLUIDA: El laboratorio de pruebas principal. Nos da acceso a JUnit para verificar que el código funciona -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Extensiones de pruebas específicas para entornos visuales (Thymeleaf y Web) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf-test</artifactId>
@@ -68,11 +88,15 @@
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Reductor de código repetitivo: genera automáticamente operaciones internas del día a día -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+		<!-- Generador de datos realistas de imitación (nombres, direcciones ficticias) para hacer pruebas con datos simulados -->
 		<dependency>
 			<groupId>com.github.javafaker</groupId>
 			<artifactId>javafaker</artifactId>
@@ -82,6 +106,7 @@
 
 	<build>
 		<plugins>
+			<!-- El "empaquetador": se encarga de juntar todo nuestro código en un único archivo ejecutable listo para funcionar -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

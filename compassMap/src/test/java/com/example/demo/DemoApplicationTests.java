@@ -7,63 +7,84 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+// Esta etiqueta le dice al laboratorio de pruebas que levante toda la infraestructura
+// de Spring Boot y prepare el acceso a la base de datos simulada en memoria.
 @SpringBootTest
 class DemoApplicationTests {
 
-	//@Autowired
-	//private CustomerRepository customerRepository;
+	// Solicitamos al sistema que nos preste el "Gestor de Clientes" (Servicio)
+	// que ya tiene listas las funciones de guardar, buscar y borrar.
 	@Autowired
 	private CustomerService customerService;
 
+	// Prueba 1: Control de encendido básico.
 	@Test
 	void contextLoads() {
+		// Verifica de forma automática que todos los componentes esenciales encajen bien.
 	}
 
+	// Prueba 2: Experimento de búsqueda en el archivador.
 	@Test
-	void findCustomerById (){
+	void findCustomerById() {
+		// Creamos y guardamos un cliente real primero para asegurarnos de que existe en esta prueba.
+		String idReal = UUID.randomUUID().toString();
+		Customer clientePrueba = new Customer(idReal, "Ana", "García", "ana@mail.com", "1234", "Calle 1");
+		customerService.createCustomer(clientePrueba);
 
-		Customer customerFound1 = customerService.getCustomerById("64c7be39-d974-419f-a766-a6063346676b");
-		System.out.println("Customer found 1 : " + customerFound1 );
+		// Intentamos buscar el cliente que acabamos de registrar usando su código único.
+		Customer customerFound1 = customerService.getCustomerById(idReal);
+		System.out.println("Customer found 1 (Existente): " + customerFound1);
+		assertNotNull(customerFound1); // Valida que realmente se haya encontrado algo.
 
-		Customer customerFound2 = customerService.getCustomerById("banana");
-		System.out.println("Customer found 2 : " + customerFound2 );
-
-
+		// Experimento de control de errores: buscamos un código que sabemos que no existe ("banana").
+		System.out.println("Intentando buscar un cliente inexistente ('banana')...");
+		assertThrows(java.util.NoSuchElementException.class, () -> {
+			customerService.getCustomerById("banana");
+		});
 	}
 
+	// Prueba 3: Experimento de eliminación segura.
 	@Test
-	void deleteCustomerById(){
+	void deleteCustomerById() {
+		// Registramos un cliente destinado a ser borrado en este experimento.
+		String idParaBorrar = UUID.randomUUID().toString();
+		Customer clienteEliminar = new Customer(idParaBorrar, "Borrame", "Pérez", "borrame@mail.com", "0000", "Calle 2");
+		customerService.createCustomer(clienteEliminar);
 
-		customerService.deleteCustomer("8b4ca0f7-5de0-4ab2-a431-a849f158cd62");
+		// Ejecutamos la orden de eliminación.
+		customerService.deleteCustomer(idParaBorrar);
+		System.out.println("Customer con ID " + idParaBorrar + " eliminado correctamente en el test.");
 	}
 
-
+	// Prueba 4: Generación masiva de datos simulados realistas.
 	@Test
-	void javaFakerCreateObjects(){
-
-
+	void javaFakerCreateObjects() {
+		// Activamos la máquina "Faker", que es como un diccionario de nombres de imitación muy realistas.
 		Faker faker = new Faker();
 
-		//String name = faker.name().fullName(); // Miss Samanta Schmidt
-		//String firstName = faker.name().firstName(); // Emory
-		//String lastName = faker.name().lastName(); // Barton
+		System.out.println("Iniciando la creación masiva de 1000 clientes simulados...");
 
-		//String streetAddress = faker.address().streetAddress(); // 60018 Sawayn Brooks Suite 449
+		for (int i = 0; i < 1000; i++) {
+			// Es vital construir un cliente nuevo en cada vuelta del bucle.
+			// Cada uno recibe un código único (UUID) y datos simulados por la factoría Faker.
+			Customer newCustomer = new Customer(
+					UUID.randomUUID().toString(), // Genera un código único automático e irrepetible.
+					faker.name().firstName(),     // Nombre ficticio realista.
+					faker.name().lastName(),      // Apellido ficticio realista.
+					faker.internet().emailAddress(), // Correo electrónico estructurado simulado.
+					faker.phoneNumber().phoneNumber(), // Teléfono ficticio.
+					faker.address().fullAddress()    // Dirección postal completa simulada.
+			);
 
-		//String titleBook = faker.book().title();
-
-		Customer newCustomer = new Customer();
-
-		for (int i= 0; i < 1000; i++){
-
-			// id?
-			newCustomer.setFirstName( faker.name().firstName()  );
-			newCustomer.setLastName(  faker.name().lastName());
-
+			// Enviamos el cliente recién creado al gestor para que lo archive de forma permanente.
 			customerService.createCustomer(newCustomer);
 		}
+
+		System.out.println("¡Éxito! Se han creado e insertado los 1000 registros en la base de datos.");
 	}
-
-
-
 }
