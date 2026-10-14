@@ -28,25 +28,40 @@ public class CustomerWebController {
     public String showCustomersPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String buscarNombre, // <-- NUEVO: Captura el texto del buscador
+            @RequestParam(required = false) String buscarTexto, // Cambiamos el nombre a uno más genérico
+            @RequestParam(defaultValue = "firstName") String criterio, // NUEVO: Captura el campo elegido en el desplegable
             Model model) {
 
-        // Creamos una ficha en blanco para el formulario de inserción
         model.addAttribute("nuevoCliente", new Customer());
+        model.addAttribute("criterioSeleccionado", criterio); // Guardamos el criterio para mantenerlo seleccionado en la web
 
-        // LÓGICA DE BÚSQUEDA: Si el usuario ha escrito algo en el buscador
-        if (buscarNombre != null && !buscarNombre.trim().isEmpty()) {
-            System.out.println("Cartero Web: Filtrando clientes por nombre: " + buscarNombre);
-            java.util.List<Customer> resultadosFiltrados = customerService.searchByFirstName(buscarNombre);
+        // LÓGICA DE BÚSQUEDA MULTICAMPO
+        if (buscarTexto != null && !buscarTexto.trim().isEmpty()) {
+            System.out.println("Cartero Web: Filtrando clientes por [" + criterio + "] con el texto: " + buscarTexto);
+            java.util.List<Customer> resultadosFiltrados;
+
+            // Evaluamos qué estantería del archivador consultar según el criterio seleccionado
+            switch (criterio) {
+                case "lastName":
+                    resultadosFiltrados = customerService.searchByLastName(buscarTexto);
+                    break;
+                case "email":
+                    resultadosFiltrados = customerService.searchByEmail(buscarTexto);
+                    break;
+                case "firstName":
+                default:
+                    resultadosFiltrados = customerService.searchByFirstName(buscarTexto);
+                    break;
+            }
 
             model.addAttribute("listaDeClientes", resultadosFiltrados);
             model.addAttribute("paginaActual", 0);
-            model.addAttribute("totalPaginas", 1); // Al estar filtrado, lo tratamos como página única
-            model.addAttribute("textoBuscado", buscarNombre); // Guardamos lo que buscó para mostrarlo en la caja
+            model.addAttribute("totalPaginas", 1);
+            model.addAttribute("textoBuscado", buscarTexto);
             return "customers";
         }
 
-        // Si no hay búsqueda, se ejecuta el motor de paginación tradicional que ya teníamos
+        // Si no hay texto en el buscador, se ejecuta la paginación tradicional
         Pageable paginaSolicitada = PageRequest.of(page, size);
         Page<Customer> paginaDeClientes = customerService.findAllPaginated(paginaSolicitada);
 
@@ -57,6 +72,7 @@ public class CustomerWebController {
 
         return "customers";
     }
+
 
 
     // NUEVA ACCIÓN: Recibir los datos del formulario web y guardarlos de verdad.

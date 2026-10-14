@@ -15,4 +15,10 @@ public interface CustomerRepository extends JpaRepository<Customer, String> {
     // "Buscar clientes cuyo nombre contenga el texto introducido (ignorando mayúsculas y minúsculas)"
     java.util.List<Customer> findByFirstNameContainingIgnoreCase(String firstName);
 
+    // El motor de Spring traducirá esto automáticamente para buscar por Apellido
+    java.util.List<Customer> findByLastNameContainingIgnoreCase(String lastName);
+
+    // El motor de Spring traducirá esto automáticamente para buscar por Correo Electrónico
+    java.util.List<Customer> findByEmailContainingIgnoreCase(String email);
+
 }

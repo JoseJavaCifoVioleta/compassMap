@@ -146,8 +146,8 @@ class DemoApplicationTests {
 		// 2. Simulamos la llamada a la página pasando la página 0, tamaño 10 y la maleta de prueba
 		org.springframework.ui.ExtendedModelMap maletaPrueba = new org.springframework.ui.ExtendedModelMap();
 
-		// ACTUALIZADO: Añadimos un null en la tercera posición para saltar el buscador en esta prueba
-		String nombrePlantilla = customerWebController.showCustomersPage(0, 10, null, maletaPrueba);
+		// ACTUALIZADO: Pasamos null tanto para el texto de búsqueda como para el criterio selectivo
+		String nombrePlantilla = customerWebController.showCustomersPage(0, 10, null, null, maletaPrueba);
 
 
 		// 3. Verifica que el cartero apunta exactamente al archivo HTML "customers"
@@ -222,5 +222,17 @@ class DemoApplicationTests {
 		System.out.println("Laboratorio: Pantalla de edición verificada con éxito. Destino: " + vistaDevuelta + ".html");
 	}
 
+	// Prueba 11: Verificación de las consultas avanzadas de búsqueda multicampo
+	@Test
+	void testAdvancedSearchCriterias() {
+		System.out.println("Laboratorio: Verificando consultas por apellido y email...");
+
+		java.util.List<Customer> porApellido = customerService.searchByLastName("García");
+		java.util.List<Customer> porEmail = customerService.searchByEmail("mail.com");
+
+		assertNotNull(porApellido);
+		assertNotNull(porEmail);
+		System.out.println("Laboratorio: Consultas multicampo operativas en el repositorio.");
+	}
 
 }

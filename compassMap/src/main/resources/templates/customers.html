@@ -39,15 +39,26 @@
         <p style="color: #666; margin: 0;">Bienvenido al panel visual de control. Las fichas se recuperan en tiempo real de nuestro archivador digital.</p>
     </div>
 
-    <!-- CAJA DE BÚSQUEDA LOCAL -->
+    <!-- CAJA DE BÚSQUEDA MULTICAMPO AVANZADA -->
     <div class="card-contenedor">
         <form th:action="@{/customers}" method="GET" class="search-form">
-            <span style="font-weight: bold; color: #4e5d6c;">🔍 Buscar por nombre:</span>
-            <input type="text" name="buscarNombre" th:value="${textoBuscado}" placeholder="Escribe un nombre a localizar..."/>
+            <span style="font-weight: bold; color: #4e5d6c;">🔍 Filtrar por:</span>
+
+            <!-- Desplegable selectivo para elegir la columna de búsqueda -->
+            <select name="criterio" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95rem; background: white;">
+                <option value="firstName" th:selected="${criterioSeleccionado == 'firstName'}">Nombre</option>
+                <option value="lastName" th:selected="${criterioSeleccionado == 'lastName'}">Apellido</option>
+                <option value="email" th:selected="${criterioSeleccionado == 'email'}">Correo Electrónico</option>
+            </select>
+
+            <!-- Cambiamos el 'name' a 'buscarTexto' para coincidir con el controlador -->
+            <input type="text" name="buscarTexto" th:value="${textoBuscado}" placeholder="Escribe tu búsqueda aquí..."/>
+
             <button type="submit" class="btn btn-info">Filtrar</button>
             <a href="/customers" class="btn btn-secondary">Limpiar</a>
         </form>
     </div>
+
 
     <!-- TABLA RESPONSIVA CORREGIDA: Exactamente 7 cabeceras alineadas con sus 7 columnas -->
     <div class="card-contenedor" th:unless="${#lists.isEmpty(listaDeClientes)}">

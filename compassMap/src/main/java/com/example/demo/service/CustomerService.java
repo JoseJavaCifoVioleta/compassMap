@@ -81,4 +81,14 @@ public class CustomerService {
         return customerRepository.findByFirstNameContainingIgnoreCase(name);
     }
 
+    // Acción: Filtrar el archivador por Apellido
+    public java.util.List<Customer> searchByLastName(String lastName) {
+        return customerRepository.findByLastNameContainingIgnoreCase(lastName);
+    }
+
+    // Acción: Filtrar el archivador por Correo Electrónico
+    public java.util.List<Customer> searchByEmail(String email) {
+        return customerRepository.findByEmailContainingIgnoreCase(email);
+    }
+
 }
