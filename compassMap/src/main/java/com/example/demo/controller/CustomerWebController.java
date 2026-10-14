@@ -28,19 +28,25 @@ public class CustomerWebController {
     public String showCustomersPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String buscarTexto, // Cambiamos el nombre a uno más genérico
-            @RequestParam(defaultValue = "firstName") String criterio, // NUEVO: Captura el campo elegido en el desplegable
+            @RequestParam(required = false) String buscarTexto,
+            @RequestParam(defaultValue = "firstName") String criterio,
+            @RequestParam(defaultValue = "id") String ordenarPor, // NUEVO: Columna por la que ordenar
+            @RequestParam(defaultValue = "asc") String direccion, // NUEVO: Sentido de ordenación ('asc' o 'desc')
             Model model) {
 
         model.addAttribute("nuevoCliente", new Customer());
-        model.addAttribute("criterioSeleccionado", criterio); // Guardamos el criterio para mantenerlo seleccionado en la web
+        model.addAttribute("criterioSeleccionado", criterio);
+        model.addAttribute("textoBuscado", buscarTexto != null ? buscarTexto : "");
 
-        // LÓGICA DE BÚSQUEDA MULTICAMPO
+        // Guardamos los valores actuales de ordenación en la maleta para usarlos en los enlaces HTML
+        model.addAttribute("columnaActual", ordenarPor);
+        model.addAttribute("siguienteDireccion", direccion.equalsIgnoreCase("asc") ? "desc" : "asc");
+
+        // LÓGICA DE BÚSQUEDA MULTICAMPO (Mantiene el filtro si existe)
         if (buscarTexto != null && !buscarTexto.trim().isEmpty()) {
             System.out.println("Cartero Web: Filtrando clientes por [" + criterio + "] con el texto: " + buscarTexto);
             java.util.List<Customer> resultadosFiltrados;
 
-            // Evaluamos qué estantería del archivador consultar según el criterio seleccionado
             switch (criterio) {
                 case "lastName":
                     resultadosFiltrados = customerService.searchByLastName(buscarTexto);
@@ -57,21 +63,24 @@ public class CustomerWebController {
             model.addAttribute("listaDeClientes", resultadosFiltrados);
             model.addAttribute("paginaActual", 0);
             model.addAttribute("totalPaginas", 1);
-            model.addAttribute("textoBuscado", buscarTexto);
             return "customers";
         }
 
-        // Si no hay texto en el buscador, se ejecuta la paginación tradicional
-        Pageable paginaSolicitada = PageRequest.of(page, size);
+        // NUEVO: Configuración del motor de ordenación nativa de Spring Data
+        org.springframework.data.domain.Sort.Direction sentido = direccion.equalsIgnoreCase("desc") ?
+                org.springframework.data.domain.Sort.Direction.DESC : org.springframework.data.domain.Sort.Direction.ASC;
+
+        // Combinamos la paginación con la ordenación por la columna solicitada
+        Pageable paginaSolicitada = PageRequest.of(page, size, org.springframework.data.domain.Sort.by(sentido, ordenarPor));
         Page<Customer> paginaDeClientes = customerService.findAllPaginated(paginaSolicitada);
 
         model.addAttribute("listaDeClientes", paginaDeClientes.getContent());
         model.addAttribute("paginaActual", page);
         model.addAttribute("totalPaginas", paginaDeClientes.getTotalPages());
-        model.addAttribute("textoBuscado", "");
 
         return "customers";
     }
+
 
 
 

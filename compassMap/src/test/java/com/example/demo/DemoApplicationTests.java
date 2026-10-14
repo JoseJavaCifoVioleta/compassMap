@@ -146,8 +146,8 @@ class DemoApplicationTests {
 		// 2. Simulamos la llamada a la página pasando la página 0, tamaño 10 y la maleta de prueba
 		org.springframework.ui.ExtendedModelMap maletaPrueba = new org.springframework.ui.ExtendedModelMap();
 
-		// ACTUALIZADO: Pasamos null tanto para el texto de búsqueda como para el criterio selectivo
-		String nombrePlantilla = customerWebController.showCustomersPage(0, 10, null, null, maletaPrueba);
+		// Pasamos 0, 10, null, null, "id", "asc", maletaPrueba
+		String nombrePlantilla = customerWebController.showCustomersPage(0, 10, null, null, "id", "asc", maletaPrueba);
 
 
 		// 3. Verifica que el cartero apunta exactamente al archivo HTML "customers"
@@ -233,6 +233,20 @@ class DemoApplicationTests {
 		assertNotNull(porApellido);
 		assertNotNull(porEmail);
 		System.out.println("Laboratorio: Consultas multicampo operativas en el repositorio.");
+	}
+
+	// Prueba 12: Verificación del motor de ordenación dinámica
+	@Test
+	void testDynamicSortingLooper() {
+		System.out.println("Laboratorio: Verificando solicitudes de ordenación por columnas...");
+
+		org.springframework.data.domain.Pageable ordenNombre = org.springframework.data.domain.PageRequest.of(
+				0, 5, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.ASC, "firstName"));
+
+		org.springframework.data.domain.Page<Customer> resultado = customerService.findAllPaginated(ordenNombre);
+
+		assertNotNull(resultado);
+		System.out.println("Laboratorio: Motor de ordenación validado en verde.");
 	}
 
 }

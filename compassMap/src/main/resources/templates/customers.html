@@ -65,14 +65,15 @@
         <div class="table-responsive">
             <table>
                 <thead>
-                <tr>
-                    <th>Código Único (ID)</th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Correo Electrónico</th>
-                    <th>Teléfono</th>
-                    <th>Dirección Postal</th>
-                    <th style="text-align: center;">Acciones Visuales</th>
+                    <tr>
+                        <!-- Al pulsar, ordena por 'id' alternando la dirección actual -->
+                        <th><a th:href="@{/customers(page=${paginaActual}, ordenarPor='id', direccion=${siguienteDireccion})}" style="color: #48cae4; text-decoration: none;">Código Único (ID) ↕</a></th>
+                        <th><a th:href="@{/customers(page=${paginaActual}, ordenarPor='firstName', direccion=${siguienteDireccion})}" style="color: #48cae4; text-decoration: none;">Nombre ↕</a></th>
+                        <th><a th:href="@{/customers(page=${paginaActual}, ordenarPor='lastName', direccion=${siguienteDireccion})}" style="color: #48cae4; text-decoration: none;">Apellido ↕</a></th>
+                        <th><a th:href="@{/customers(page=${paginaActual}, ordenarPor='email', direccion=${siguienteDireccion})}" style="color: #48cae4; text-decoration: none;">Correo Electrónico ↕</a></th>
+                        <th>Teléfono</th>
+                        <th>Dirección Postal</th>
+                        <th style="text-align: center; color: white;">Acciones Visuales</th>
                 </tr>
                 </thead>
                 <tbody>
