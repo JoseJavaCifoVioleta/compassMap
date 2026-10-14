@@ -1,32 +1,29 @@
 package com.example.demo.controller;
 
-// ¡ESTOS IMPORTS SON LAS LLAVES QUE FALTABAN!
 import com.example.demo.model.Customer;
 import com.example.demo.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-// Esta etiqueta indica al sistema que esta clase es un "Cartero Visual".
 @Controller
 public class CustomerWebController {
 
-    // CORRECCIÓN: Declaramos la variable 'customerService' y le ponemos el conector automático
     @Autowired
     private CustomerService customerService;
 
-    // Nueva Ruta: Página de Inicio Principal (La matriz interactiva de tu profesor)
     @GetMapping({"/", "/index"})
     public String showIndexPage() {
         return "index";
     }
 
-    // Ruta Modificada: Listar clientes de forma ordenada con paginación
     @GetMapping("/customers")
     public String showCustomersPage(
             @RequestParam(defaultValue = "0") int page,
@@ -35,15 +32,28 @@ public class CustomerWebController {
 
         System.out.println("Cartero Web: Cargando página número " + page + " con bloques de " + size + " clientes.");
 
-        // Solicitamos el bloque específico de datos al servicio
         Pageable paginaSolicitada = PageRequest.of(page, size);
         Page<Customer> paginaDeClientes = customerService.findAllPaginated(paginaSolicitada);
 
-        // Metemos en la maleta de viaje los datos del bloque y los controles de navegación
         model.addAttribute("listaDeClientes", paginaDeClientes.getContent());
         model.addAttribute("paginaActual", page);
         model.addAttribute("totalPaginas", paginaDeClientes.getTotalPages());
 
+        // MEJORA: Dejamos una "ficha en blanco" en la maleta para que el formulario HTML la rellene.
+        model.addAttribute("nuevoCliente", new Customer());
+
         return "customers";
+    }
+
+    // NUEVA ACCIÓN: Recibir los datos del formulario web y guardarlos de verdad.
+    @PostMapping("/customers/save")
+    public String saveCustomerFromWeb(@ModelAttribute("nuevoCliente") Customer customer) {
+        System.out.println("Cartero Web: Recibidos datos del formulario para registrar a: " + customer.getFirstName());
+
+        // Guardamos el cliente en el archivador digital a través del servicio
+        customerService.createCustomer(customer);
+
+        // Redirigimos al usuario de vuelta a la lista para que vea su nuevo registro al instante
+        return "redirect:/customers";
     }
 }

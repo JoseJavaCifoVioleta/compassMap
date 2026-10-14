@@ -67,5 +67,37 @@
 
 <p style="text-align: center; margin-top: 30px;"><a href="/index" style="color: #34495e; font-weight: bold;">🏠 Volver a la Matriz de Perfiles</a></p>
 
+<!-- SECCIÓN NUEVA: FORMULARIO INTERACTIVO DE ALTA -->
+<div style="max-width: 600px; margin: 40px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+    <h2 style="color: #2c3e50; border-bottom: 2px solid #00b4d8; padding-bottom: 8px; margin-top: 0;">➕ Registrar Nuevo Cliente Manual</h2>
+    <p style="color: #7f8c8d; font-size: 0.9rem;">Rellena los campos para añadir una ficha real de forma directa al archivador.</p>
+
+    <!-- El formulario apunta a nuestra nueva ruta POST y se enlaza con la ficha en blanco 'nuevoCliente' -->
+    <form th:action="@{/customers/save}" th:object="${nuevoCliente}" method="POST">
+        <div style="margin-bottom: 12px;">
+            <label style="display:block; font-weight:bold; margin-bottom:5px; color:#34495e;">Nombre:</label>
+            <input type="text" th:field="*{firstName}" required style="width:95%; padding:8px; border:1px solid #ccc; border-radius:4px;"/>
+        </div>
+        <div style="margin-bottom: 12px;">
+            <label style="display:block; font-weight:bold; margin-bottom:5px; color:#34495e;">Apellido:</label>
+            <input type="text" th:field="*{lastName}" required style="width:95%; padding:8px; border:1px solid #ccc; border-radius:4px;"/>
+        </div>
+        <div style="margin-bottom: 12px;">
+            <label style="display:block; font-weight:bold; margin-bottom:5px; color:#34495e;">Correo Electrónico:</label>
+            <input type="email" th:field="*{email}" required style="width:95%; padding:8px; border:1px solid #ccc; border-radius:4px;"/>
+        </div>
+        <div style="margin-bottom: 12px;">
+            <label style="display:block; font-weight:bold; margin-bottom:5px; color:#34495e;">Teléfono:</label>
+            <input type="text" th:field="*{phone}" style="width:95%; padding:8px; border:1px solid #ccc; border-radius:4px;"/>
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label style="display:block; font-weight:bold; margin-bottom:5px; color:#34495e;">Dirección Postal:</label>
+            <input type="text" th:field="*{address}" style="width:95%; padding:8px; border:1px solid #ccc; border-radius:4px;"/>
+        </div>
+
+        <button type="submit" style="width:100%; padding:12px; background-color:#2a9d8f; color:white; border:none; border-radius:6px; font-weight:bold; font-size:1rem; cursor:pointer;">💾 Registrar y Guardar en Base de Datos</button>
+    </form>
+</div>
+
 </body>
 </html>

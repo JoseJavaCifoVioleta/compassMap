@@ -168,4 +168,24 @@ class DemoApplicationTests {
 		System.out.println("Laboratorio: Motor de paginación respondiendo con éxito.");
 	}
 
+	// Prueba 8: Verificación del procesamiento de envíos del formulario web
+	@Test
+	void testCustomerFormSubmissionRoute() {
+		System.out.println("Laboratorio: Verificando recepción de envíos del formulario...");
+
+		// 1. Fabricamos una ficha ficticia simulando la entrada desde la web
+		Customer clienteFormulario = Customer.builder()
+				.firstName("Carlos")
+				.lastName("Mendoza")
+				.email("carlos@mail.com")
+				.build();
+
+		// 2. Enviamos la ficha al método del controlador
+		String redireccion = customerWebController.saveCustomerFromWeb(clienteFormulario);
+
+		// 3. Certificamos que el sistema procesa los datos y redirige a la lista para actualizarla
+		org.junit.jupiter.api.Assertions.assertEquals("redirect:/customers", redireccion);
+		System.out.println("Laboratorio: Formulario procesado. Redirección exitosa hacia: " + redireccion);
+	}
+
 }
