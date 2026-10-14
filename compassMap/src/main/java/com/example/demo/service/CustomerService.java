@@ -75,4 +75,10 @@ public class CustomerService {
         // Le pide al archivador automático que solo traiga el pedazo de fichas solicitado.
         return customerRepository.findAll(pageable);
     }
+
+    // Acción: Filtrar el archivador para encontrar fichas por nombre
+    public java.util.List<Customer> searchByFirstName(String name) {
+        return customerRepository.findByFirstNameContainingIgnoreCase(name);
+    }
+
 }

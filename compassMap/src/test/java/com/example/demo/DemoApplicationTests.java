@@ -146,8 +146,9 @@ class DemoApplicationTests {
 		// 2. Simulamos la llamada a la página pasando la página 0, tamaño 10 y la maleta de prueba
 		org.springframework.ui.ExtendedModelMap maletaPrueba = new org.springframework.ui.ExtendedModelMap();
 
-		// ACTUALIZADO: Añadimos el '0, 10, ' antes de la maleta para cumplir con la nueva estructura
-		String nombrePlantilla = customerWebController.showCustomersPage(0, 10, maletaPrueba);
+		// ACTUALIZADO: Añadimos un null en la tercera posición para saltar el buscador en esta prueba
+		String nombrePlantilla = customerWebController.showCustomersPage(0, 10, null, maletaPrueba);
+
 
 		// 3. Verifica que el cartero apunta exactamente al archivo HTML "customers"
 		org.junit.jupiter.api.Assertions.assertEquals("customers", nombrePlantilla);
@@ -187,5 +188,18 @@ class DemoApplicationTests {
 		org.junit.jupiter.api.Assertions.assertEquals("redirect:/customers", redireccion);
 		System.out.println("Laboratorio: Formulario procesado. Redirección exitosa hacia: " + redireccion);
 	}
+	// Prueba 9: Verificación del motor de búsqueda por nombre filtrado
+	@Test
+	void testCustomerSearchEngine() {
+		System.out.println("Laboratorio: Verificando el filtro de búsqueda por nombre...");
+
+		// Forzamos una búsqueda con un nombre común
+		java.util.List<Customer> resultados = customerService.searchByFirstName("Ana");
+
+		// El test da por buena la característica si el motor procesa la consulta sin colapsar
+		assertNotNull(resultados);
+		System.out.println("Laboratorio: Buscador operativo. Encontró " + resultados.size() + " coincidencias.");
+	}
+
 
 }

@@ -11,4 +11,8 @@ import org.springframework.stereotype.Repository;
 public interface CustomerRepository extends JpaRepository<Customer, String> {
     // Aquí dentro no necesitamos declarar métodos manuales por ahora.
     // El sistema ya sabe que guardaremos fichas de tipo 'Customer' usando una 'String' (texto) como llave única.
+    // El motor de Spring traducirá esto automáticamente en:
+    // "Buscar clientes cuyo nombre contenga el texto introducido (ignorando mayúsculas y minúsculas)"
+    java.util.List<Customer> findByFirstNameContainingIgnoreCase(String firstName);
+
 }

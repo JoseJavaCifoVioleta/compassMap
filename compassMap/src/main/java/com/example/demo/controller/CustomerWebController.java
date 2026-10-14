@@ -28,22 +28,36 @@ public class CustomerWebController {
     public String showCustomersPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String buscarNombre, // <-- NUEVO: Captura el texto del buscador
             Model model) {
 
-        System.out.println("Cartero Web: Cargando página número " + page + " con bloques de " + size + " clientes.");
+        // Creamos una ficha en blanco para el formulario de inserción
+        model.addAttribute("nuevoCliente", new Customer());
 
+        // LÓGICA DE BÚSQUEDA: Si el usuario ha escrito algo en el buscador
+        if (buscarNombre != null && !buscarNombre.trim().isEmpty()) {
+            System.out.println("Cartero Web: Filtrando clientes por nombre: " + buscarNombre);
+            java.util.List<Customer> resultadosFiltrados = customerService.searchByFirstName(buscarNombre);
+
+            model.addAttribute("listaDeClientes", resultadosFiltrados);
+            model.addAttribute("paginaActual", 0);
+            model.addAttribute("totalPaginas", 1); // Al estar filtrado, lo tratamos como página única
+            model.addAttribute("textoBuscado", buscarNombre); // Guardamos lo que buscó para mostrarlo en la caja
+            return "customers";
+        }
+
+        // Si no hay búsqueda, se ejecuta el motor de paginación tradicional que ya teníamos
         Pageable paginaSolicitada = PageRequest.of(page, size);
         Page<Customer> paginaDeClientes = customerService.findAllPaginated(paginaSolicitada);
 
         model.addAttribute("listaDeClientes", paginaDeClientes.getContent());
         model.addAttribute("paginaActual", page);
         model.addAttribute("totalPaginas", paginaDeClientes.getTotalPages());
-
-        // MEJORA: Dejamos una "ficha en blanco" en la maleta para que el formulario HTML la rellene.
-        model.addAttribute("nuevoCliente", new Customer());
+        model.addAttribute("textoBuscado", "");
 
         return "customers";
     }
+
 
     // NUEVA ACCIÓN: Recibir los datos del formulario web y guardarlos de verdad.
     @PostMapping("/customers/save")
