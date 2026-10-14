@@ -16,7 +16,8 @@ public class BackOffice {
     // it is the entry-point for the backoffice class
     // and it has the main MENU, main options
     // and CRUD operation for our model and fake data
-    public static void startBackOffice(PopulatorDB populatorDB) {
+    // Añadimos 'CustomerService customerService' al final de los parámetros de entrada del método
+    public static void startBackOffice(PopulatorDB populatorDB, CustomerService customerService) {
         // We will create just one scanner object
         // and it will pass to another methods
         Scanner scan = new Scanner(System.in);
@@ -29,7 +30,8 @@ public class BackOffice {
             switch (option) {
                 case "1":
                     // customerLoop(scan, populatorDB, populatorDB.customerService);
-                    customerSubMenu(scan, populatorDB, populatorDB.customerService);
+                    // Corregimos las líneas sustituyendo 'populatorDB.customerService' por nuestro nuevo parámetro directo
+                    customerSubMenu(scan, populatorDB, customerService);
                     break;
                 case "2":
                     // System.out.println("Roadmap - not implemented yet.");

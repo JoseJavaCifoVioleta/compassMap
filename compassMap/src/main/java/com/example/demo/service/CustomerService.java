@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,7 +28,10 @@ public class CustomerService {
     }
 
 
-    public Iterable<Customer> findAll() {
+    // Modifica este método para que devuelva un List en lugar de un Iterable
+    // Acción: Consultar el listado completo de clientes.
+    public List<Customer> findAll() {
+        // Al usar JpaRepository, findAll() ya devuelve directamente un List<Customer>.
         return customerRepository.findAll();
     }
 
@@ -45,7 +49,15 @@ public class CustomerService {
         return foundCustomer.get();
     }
 
-    public void saveAll(ArrayList<Customer> customers) {
+    // Modifica la firma de este método cambiando ArrayList por List
+    // Acción: Guardar un paquete masivo de clientes a la vez.
+    public void saveAll(List<Customer> customers) {
+        // Aseguramos que cada miembro de la lista tenga su identificador único antes de guardarlo.
+        for (Customer c : customers) {
+            if (c.getId() == null || c.getId().isEmpty()) {
+                c.setId(UUID.randomUUID().toString());
+            }
+        }
         customerRepository.saveAll(customers);
     }
 
