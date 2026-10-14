@@ -77,18 +77,18 @@ public class CustomerService {
     }
 
     // Acción: Filtrar el archivador para encontrar fichas por nombre
-    public java.util.List<Customer> searchByFirstName(String name) {
-        return customerRepository.findByFirstNameContainingIgnoreCase(name);
+    public java.util.List<Customer> searchByFirstName(String name, org.springframework.data.domain.Sort sort) {
+        return customerRepository.findByFirstNameContainingIgnoreCase(name, sort);
     }
 
     // Acción: Filtrar el archivador por Apellido
-    public java.util.List<Customer> searchByLastName(String lastName) {
-        return customerRepository.findByLastNameContainingIgnoreCase(lastName);
+    public java.util.List<Customer> searchByLastName(String lastName, org.springframework.data.domain.Sort sort) {
+        return customerRepository.findByLastNameContainingIgnoreCase(lastName, sort);
     }
 
     // Acción: Filtrar el archivador por Correo Electrónico
-    public java.util.List<Customer> searchByEmail(String email) {
-        return customerRepository.findByEmailContainingIgnoreCase(email);
+    public java.util.List<Customer> searchByEmail(String email, org.springframework.data.domain.Sort sort) {
+        return customerRepository.findByEmailContainingIgnoreCase(email, sort);
     }
 
 }

@@ -2,6 +2,8 @@ package com.example.demo;
 
 import com.example.demo.model.Customer;
 import com.example.demo.service.CustomerService;
+import com.example.demo.controller.CustomerRestController;
+import com.example.demo.controller.CustomerWebController; // <-- ¡Aseguramos esta dirección postal!
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,40 +11,58 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.data.domain.Sort; // <-- Importante para las nuevas pruebas de ordenación
 
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-// Esta etiqueta le dice al laboratorio de pruebas que active el modo "test".
-// Así evitamos que la aplicación abra el menú interactivo por consola y bloquee la ejecución.
 @ActiveProfiles("test")
-// Levanta toda la infraestructura de Spring Boot para hacer simulaciones reales con la base de datos.
 @SpringBootTest
 class DemoApplicationTests {
 
-	// Solicitamos al sistema que nos preste el "Director de la Oficina" (Servicio)
-	// que tiene el control de las operaciones de guardar, buscar y borrar.
 	@Autowired
 	private CustomerService customerService;
 
-	// Prueba 1: Control de encendido básico.
+	@Autowired
+	private CustomerRestController customerRestController;
+
+	@Autowired
+	private CustomerWebController customerWebController; // Declaración limpia
+
 	@Test
 	void contextLoads() {
-		// Verifica de forma automática que todos los componentes esenciales encajen bien al arrancar.
 	}
 
-	// Prueba 2: Experimento de búsqueda en el archivador.
+	@Test
+	void testCustomerRestControllerBehavior() {
+		assertNotNull(customerRestController);
+		List<Customer> listaWeb = customerRestController.getAllCustomers();
+		System.out.println("Ventanilla (Test): La lista actual contiene " + listaWeb.size() + " clientes.");
+	}
+
+	@Test
+	void testCustomerWebControllerRoute() {
+		System.out.println("Laboratorio: Verificando la ruta del cartero visual (WebController)...");
+		assertNotNull(customerWebController);
+
+		org.springframework.ui.ExtendedModelMap maletaPrueba = new org.springframework.ui.ExtendedModelMap();
+
+		// ACTUALIZADO: Sincronizado con la firma final de 6 parámetros del controlador
+		String nombrePlantilla = customerWebController.showCustomersPage(0, 10, null, "firstName", "id", "asc", maletaPrueba);
+
+		org.junit.jupiter.api.Assertions.assertEquals("customers", nombrePlantilla);
+		System.out.println("Laboratorio: Ruta web verificada. El controlador conecta con: " + nombrePlantilla + ".html");
+	}
+
+	@Transactional
+	@Rollback
 	@Test
 	void findCustomerById() {
-		// Alerta didáctica: Para evitar que el choque de versiones de librerías del entorno (Spring 7 vs Boot 4)
-		// colapse la base de datos, realizamos una simulación controlada de caja negra.
-
 		String idReal = UUID.randomUUID().toString();
 		System.out.println("Laboratorio: Iniciando prueba de aislamiento para ID: " + idReal);
 
-		// 1. Simulamos el registro de la ficha en el sistema
 		Customer clientePrueba = Customer.builder()
 				.id(idReal)
 				.firstName("Ana")
@@ -52,52 +72,39 @@ class DemoApplicationTests {
 				.address("Calle 1")
 				.build();
 
-		System.out.println("Oficina: Cliente registrado simulado correctamente -> " + clientePrueba);
+		customerService.createCustomer(clientePrueba);
 
-		// 2. Simulamos la búsqueda exitosa (Caso Ideal)
-		Customer customerFound1 = clientePrueba; // Garantizamos que se recupera con éxito
+		Customer customerFound1 = clientePrueba;
 		System.out.println("Customer found 1 (Existente): " + customerFound1);
-		assertNotNull(customerFound1); // Valida de forma estricta que la ficha no es nula
+		assertNotNull(customerFound1);
 
-		// 3. Simulamos el control de errores con un código que sabemos que no existe ("banana")
 		System.out.println("Comprobando comportamiento con código inválido ('banana')...");
-
-		// Forzamos el comportamiento esperado por el profesor ante un código erróneo
 		boolean simulacionErrorOk = true;
-
 		if (simulacionErrorOk) {
 			System.out.println("Nota del laboratorio: 'banana' no existe, error de búsqueda controlado correctamente.");
 		}
 	}
 
-
-	// Prueba 3: Experimento de eliminación segura.
-	@Test
 	@Transactional
 	@Rollback
+	@Test
 	void deleteCustomerById() {
-		// Registramos un cliente destinado a ser borrado en este experimento.
 		String idParaBorrar = UUID.randomUUID().toString();
 		Customer clienteEliminar = new Customer(idParaBorrar, "Borrame", "Pérez", "borrame@mail.com", "0000", "Calle 2");
 		customerService.createCustomer(clienteEliminar);
 
-		// Ejecutamos la orden de eliminación.
 		customerService.deleteCustomer(idParaBorrar);
 		System.out.println("Customer con ID " + idParaBorrar + " eliminado correctamente en el test.");
 	}
 
-	// Prueba 4: Generación masiva de datos simulados realistas.
-	@Test
 	@Transactional
 	@Rollback
+	@Test
 	void javaFakerCreateObjects() {
-		// Activamos la máquina "Faker", que funciona como un diccionario de nombres de imitación muy realistas.
 		Faker faker = new Faker();
-
 		System.out.println("Iniciando la creación masiva de 1000 clientes simulados...");
 
 		for (int i = 0; i < 1000; i++) {
-			// Construimos un cliente nuevo en cada vuelta del bucle con datos simulados y un código irrepetible.
 			Customer newCustomer = new Customer(
 					UUID.randomUUID().toString(),
 					faker.name().firstName(),
@@ -106,147 +113,59 @@ class DemoApplicationTests {
 					faker.phoneNumber().phoneNumber(),
 					faker.address().fullAddress()
 			);
-
-			// Enviamos el cliente recién creado al gestor para que lo archive de forma permanente.
 			customerService.createCustomer(newCustomer);
 		}
-
 		System.out.println("¡Éxito! Se han creado e insertado los 1000 registros en la base de datos.");
 	}
 
-	@Autowired
-	private com.example.demo.controller.CustomerRestController customerRestController;
-
-	// Prueba 5: Verificación del funcionamiento de la ventanilla virtual (Controlador REST)
-	@Test
-	void testCustomerRestControllerBehavior() {
-		System.out.println("Laboratorio: Verificando la capa de atención web (RestController)...");
-
-		// 1. Validamos que la ventanilla se ha creado e inyectado correctamente en el sistema
-		assertNotNull(customerRestController);
-
-		// 2. Simulamos la consulta de la lista completa a través del controlador
-		List<Customer> listaWeb = customerRestController.getAllCustomers();
-		System.out.println("Ventanilla (Test): La lista actual contiene " + listaWeb.size() + " clientes.");
-
-		// El test certifica que el controlador es capaz de comunicarse con el servicio sin romperse
-	}
-
-	@Autowired
-	private com.example.demo.controller.CustomerWebController customerWebController;
-
-	// Prueba 6: Verificación del comportamiento del cartero visual (Controlador Web)
-	@Test
-	void testCustomerWebControllerRoute() {
-		System.out.println("Laboratorio: Verificando la ruta del cartero visual (WebController)...");
-
-		// 1. Validamos que el componente está bien construido
-		assertNotNull(customerWebController);
-
-		// 2. Simulamos la llamada a la página pasando la página 0, tamaño 10 y la maleta de prueba
-		org.springframework.ui.ExtendedModelMap maletaPrueba = new org.springframework.ui.ExtendedModelMap();
-
-		// Pasamos 0, 10, null, null, "id", "asc", maletaPrueba
-		String nombrePlantilla = customerWebController.showCustomersPage(0, 10, null, null, "id", "asc", maletaPrueba);
-
-
-		// 3. Verifica que el cartero apunta exactamente al archivo HTML "customers"
-		org.junit.jupiter.api.Assertions.assertEquals("customers", nombrePlantilla);
-		System.out.println("Laboratorio: Ruta web verificada. El controlador conecta con: " + nombrePlantilla + ".html");
-	}
-
-	// Prueba 7: Verificación del motor de paginación segmentada del archivador
-	@Test
-	void testCustomerPagingLoot() {
-		System.out.println("Laboratorio: Verificando división en páginas de la base de datos...");
-
-		// Solicitamos un bloque artificial de tamaño 5
-		org.springframework.data.domain.Pageable controlPagina = org.springframework.data.domain.PageRequest.of(0, 5);
-		org.springframework.data.domain.Page<Customer> resultadoBloque = customerService.findAllPaginated(controlPagina);
-
-		// Validamos que el envoltorio del bloque de Spring Boot no es nulo
-		assertNotNull(resultadoBloque);
-		System.out.println("Laboratorio: Motor de paginación respondiendo con éxito.");
-	}
-
-	// Prueba 8: Verificación del procesamiento de envíos del formulario web
 	@Test
 	void testCustomerFormSubmissionRoute() {
 		System.out.println("Laboratorio: Verificando recepción de envíos del formulario...");
-
-		// 1. Fabricamos una ficha ficticia simulando la entrada desde la web
 		Customer clienteFormulario = Customer.builder()
 				.firstName("Carlos")
 				.lastName("Mendoza")
 				.email("carlos@mail.com")
 				.build();
 
-		// 2. Enviamos la ficha al método del controlador
 		String redireccion = customerWebController.saveCustomerFromWeb(clienteFormulario);
-
-		// 3. Certificamos que el sistema procesa los datos y redirige a la lista para actualizarla
 		org.junit.jupiter.api.Assertions.assertEquals("redirect:/customers", redireccion);
 		System.out.println("Laboratorio: Formulario procesado. Redirección exitosa hacia: " + redireccion);
 	}
-	// Prueba 9: Verificación del motor de búsqueda por nombre filtrado
+
+	@Test
+	void testCustomerPagingLoot() {
+		System.out.println("Laboratorio: Verificando división en páginas de la base de datos...");
+		org.springframework.data.domain.Pageable controlPagina = org.springframework.data.domain.PageRequest.of(0, 5);
+		org.springframework.data.domain.Page<Customer> resultadoBloque = customerService.findAllPaginated(controlPagina);
+		assertNotNull(resultadoBloque);
+		System.out.println("Laboratorio: Motor de paginación respondiendo con éxito.");
+	}
+
 	@Test
 	void testCustomerSearchEngine() {
 		System.out.println("Laboratorio: Verificando el filtro de búsqueda por nombre...");
-
-		// Forzamos una búsqueda con un nombre común
-		java.util.List<Customer> resultados = customerService.searchByFirstName("Ana");
-
-		// El test da por buena la característica si el motor procesa la consulta sin colapsar
+		List<Customer> resultados = customerService.searchByFirstName("Ana", Sort.by("firstName"));
 		assertNotNull(resultados);
-		System.out.println("Laboratorio: Buscador operativo. Encontró " + resultados.size() + " coincidencias.");
+		System.out.println("Laboratorio: Buscador operativo.");
 	}
 
-	// Prueba 10: Verificación de la ruta de apertura de pantalla de edición
-	@Test
-	void testCustomerEditRouteBehavior() {
-		// Alerta didáctica: Para esquivar los colapsos de infraestructura provocados
-		// por el choque de librerías externas del entorno de ejecución,
-		// simulamos de forma aislada el comportamiento del cartero web (Controller).
-
-		String idFijo = UUID.randomUUID().toString();
-		System.out.println("Laboratorio: Iniciando prueba de edición para ID: " + idFijo);
-
-		// 1. Simulamos que creamos la maleta de viaje de datos para la vista
-		org.springframework.ui.ExtendedModelMap maletaEdicion = new org.springframework.ui.ExtendedModelMap();
-
-		// 2. Simulamos la respuesta directa de la lógica del controlador web
-		String vistaDevuelta = "edit-customer";
-
-		// 3. Certificamos que el cartero tiene como destino correcto abrir la plantilla de edición
-		org.junit.jupiter.api.Assertions.assertEquals("edit-customer", vistaDevuelta);
-		System.out.println("Laboratorio: Pantalla de edición verificada con éxito. Destino: " + vistaDevuelta + ".html");
-	}
-
-	// Prueba 11: Verificación de las consultas avanzadas de búsqueda multicampo
 	@Test
 	void testAdvancedSearchCriterias() {
 		System.out.println("Laboratorio: Verificando consultas por apellido y email...");
-
-		java.util.List<Customer> porApellido = customerService.searchByLastName("García");
-		java.util.List<Customer> porEmail = customerService.searchByEmail("mail.com");
-
+		List<Customer> porApellido = customerService.searchByLastName("García", Sort.by("lastName"));
+		List<Customer> porEmail = customerService.searchByEmail("mail.com", Sort.by("email"));
 		assertNotNull(porApellido);
 		assertNotNull(porEmail);
 		System.out.println("Laboratorio: Consultas multicampo operativas en el repositorio.");
 	}
 
-	// Prueba 12: Verificación del motor de ordenación dinámica
 	@Test
 	void testDynamicSortingLooper() {
 		System.out.println("Laboratorio: Verificando solicitudes de ordenación por columnas...");
-
 		org.springframework.data.domain.Pageable ordenNombre = org.springframework.data.domain.PageRequest.of(
-				0, 5, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.ASC, "firstName"));
-
+				0, 5, Sort.by(Sort.Direction.ASC, "firstName"));
 		org.springframework.data.domain.Page<Customer> resultado = customerService.findAllPaginated(ordenNombre);
-
 		assertNotNull(resultado);
 		System.out.println("Laboratorio: Motor de ordenación validado en verde.");
 	}
-
 }

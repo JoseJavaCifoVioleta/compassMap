@@ -30,33 +30,36 @@ public class CustomerWebController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String buscarTexto,
             @RequestParam(defaultValue = "firstName") String criterio,
-            @RequestParam(defaultValue = "id") String ordenarPor, // NUEVO: Columna por la que ordenar
-            @RequestParam(defaultValue = "asc") String direccion, // NUEVO: Sentido de ordenación ('asc' o 'desc')
+            @RequestParam(defaultValue = "id") String ordenarPor,
+            @RequestParam(defaultValue = "asc") String direccion,
             Model model) {
 
         model.addAttribute("nuevoCliente", new Customer());
         model.addAttribute("criterioSeleccionado", criterio);
         model.addAttribute("textoBuscado", buscarTexto != null ? buscarTexto : "");
-
-        // Guardamos los valores actuales de ordenación en la maleta para usarlos en los enlaces HTML
         model.addAttribute("columnaActual", ordenarPor);
         model.addAttribute("siguienteDireccion", direccion.equalsIgnoreCase("asc") ? "desc" : "asc");
 
-        // LÓGICA DE BÚSQUEDA MULTICAMPO (Mantiene el filtro si existe)
+        // 1. Configuración del motor de ordenación nativa de Spring Data
+        org.springframework.data.domain.Sort.Direction sentido = direccion.equalsIgnoreCase("desc") ?
+                org.springframework.data.domain.Sort.Direction.DESC : org.springframework.data.domain.Sort.Direction.ASC;
+        org.springframework.data.domain.Sort reglaOrdenacion = org.springframework.data.domain.Sort.by(sentido, ordenarPor);
+
+        // 2. LÓGICA DE BÚSQUEDA MULTICAMPO (Con ordenación integrada)
         if (buscarTexto != null && !buscarTexto.trim().isEmpty()) {
-            System.out.println("Cartero Web: Filtrando clientes por [" + criterio + "] con el texto: " + buscarTexto);
+            System.out.println("Cartero Web: Filtrando y Ordenando por [" + criterio + "] con el texto: " + buscarTexto);
             java.util.List<Customer> resultadosFiltrados;
 
             switch (criterio) {
                 case "lastName":
-                    resultadosFiltrados = customerService.searchByLastName(buscarTexto);
+                    resultadosFiltrados = customerService.searchByLastName(buscarTexto, reglaOrdenacion);
                     break;
                 case "email":
-                    resultadosFiltrados = customerService.searchByEmail(buscarTexto);
+                    resultadosFiltrados = customerService.searchByEmail(buscarTexto, reglaOrdenacion);
                     break;
                 case "firstName":
                 default:
-                    resultadosFiltrados = customerService.searchByFirstName(buscarTexto);
+                    resultadosFiltrados = customerService.searchByFirstName(buscarTexto, reglaOrdenacion);
                     break;
             }
 
@@ -66,12 +69,8 @@ public class CustomerWebController {
             return "customers";
         }
 
-        // NUEVO: Configuración del motor de ordenación nativa de Spring Data
-        org.springframework.data.domain.Sort.Direction sentido = direccion.equalsIgnoreCase("desc") ?
-                org.springframework.data.domain.Sort.Direction.DESC : org.springframework.data.domain.Sort.Direction.ASC;
-
-        // Combinamos la paginación con la ordenación por la columna solicitada
-        Pageable paginaSolicitada = PageRequest.of(page, size, org.springframework.data.domain.Sort.by(sentido, ordenarPor));
+        // 3. Si no hay búsqueda, se ejecuta la paginación tradicional con ordenación
+        Pageable paginaSolicitada = PageRequest.of(page, size, reglaOrdenacion);
         Page<Customer> paginaDeClientes = customerService.findAllPaginated(paginaSolicitada);
 
         model.addAttribute("listaDeClientes", paginaDeClientes.getContent());
@@ -80,6 +79,7 @@ public class CustomerWebController {
 
         return "customers";
     }
+
 
 
 

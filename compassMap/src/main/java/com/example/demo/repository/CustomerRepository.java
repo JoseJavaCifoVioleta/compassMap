@@ -13,12 +13,16 @@ public interface CustomerRepository extends JpaRepository<Customer, String> {
     // El sistema ya sabe que guardaremos fichas de tipo 'Customer' usando una 'String' (texto) como llave única.
     // El motor de Spring traducirá esto automáticamente en:
     // "Buscar clientes cuyo nombre contenga el texto introducido (ignorando mayúsculas y minúsculas)"
-    java.util.List<Customer> findByFirstNameContainingIgnoreCase(String firstName);
+
+    // Añadimos el parámetro 'Sort' para que ordene los resultados del filtro sobre la marcha
+    java.util.List<Customer> findByFirstNameContainingIgnoreCase(String firstName, org.springframework.data.domain.Sort sort);
 
     // El motor de Spring traducirá esto automáticamente para buscar por Apellido
-    java.util.List<Customer> findByLastNameContainingIgnoreCase(String lastName);
+    // Añadimos el parámetro 'Sort' para que ordene los resultados del filtro sobre la marcha
+    java.util.List<Customer> findByLastNameContainingIgnoreCase(String lastName, org.springframework.data.domain.Sort sort);
 
     // El motor de Spring traducirá esto automáticamente para buscar por Correo Electrónico
-    java.util.List<Customer> findByEmailContainingIgnoreCase(String email);
+    // Añadimos el parámetro 'Sort' para que ordene los resultados del filtro sobre la marcha
+    java.util.List<Customer> findByEmailContainingIgnoreCase(String email, org.springframework.data.domain.Sort sort);
 
 }
