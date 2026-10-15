@@ -193,4 +193,22 @@ class DemoApplicationTests {
 		System.out.println("Laboratorio: Hoja de ruta guardada con éxito. Conteo actual en almacén: " + cantidad);
 	}
 
+	// Prueba 15: Verificación del flujo dinámico de la matriz de perfiles principal
+	@Test
+	void testIndexPageDynamicCatalogLoot() {
+		System.out.println("Laboratorio: Verificando la maleta de datos de la página principal index.html...");
+
+		// 1. Creamos una maleta artificial de pruebas
+		org.springframework.ui.ExtendedModelMap maletaInicio = new org.springframework.ui.ExtendedModelMap();
+
+		// 2. Llamamos al método del inicio
+		String vistaObtenida = customerWebController.showIndexPage(maletaInicio);
+
+		// 3. Certificamos que la maleta contiene las rutas cargadas y apunta a 'index'
+		org.junit.jupiter.api.Assertions.assertEquals("index", vistaObtenida);
+		org.junit.jupiter.api.Assertions.assertNotNull(maletaInicio.getAttribute("catalogoRutas"));
+		System.out.println("Laboratorio: Flujo del tablero principal validado con éxito.");
+	}
+
+
 }

@@ -38,36 +38,44 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td><span class="badge-true">✓ true</span></td>
-            <td><span class="badge-true">✓ true</span></td>
-            <td style="color: #48cae4; font-weight: bold;">Pujar de nivell</td>
-            <td>Desenvolupadors amb experiència que volen aprofundir en arquitectura, DDD. <br><br>
-                <a href="/customers" class="btn-action">Ver Ruta DDD Mastery</a>
+        <!-- El bucle recorre la lista y la herramienta 'estado' nos da el número de fila (0, 1, 2, 3) -->
+        <tr th:each="rutaTexto, estado : ${catalogoRutasTexto}">
+
+            <!-- Columna 1: ¿Se programar? (Evaluamos según la posición de la fila) -->
+            <td>
+                <!-- Fila 0 (DDD) y Fila 1 (AI) dan true -->
+                <span th:if="${estado.index == 0 or estado.index == 1}" class="badge-true">✓ true</span>
+                <span th:unless="${estado.index == 0 or estado.index == 1}" class="badge-false">✗ false</span>
             </td>
-        </tr>
-        <tr>
-            <td><span class="badge-true">✓ true</span></td>
-            <td><span class="badge-false">✗ false</span></td>
-            <td style="color: #48cae4; font-weight: bold;">Usar AI per crear projectes</td>
-            <td>Persones que ja saben programar però prioritzen velocitat i productivitat. <br><br>
-                <a href="/customers" class="btn-action">Ver Ruta AI Shipping</a>
+
+            <!-- Columna 2: ¿Vull aprendre a programar? -->
+            <td>
+                <!-- Fila 0 (DDD) y Fila 2 (Code) dan true -->
+                <span th:if="${estado.index == 0 or estado.index == 2}" class="badge-true">✓ true</span>
+                <span th:unless="${estado.index == 0 or estado.index == 2}" class="badge-false">✗ false</span>
             </td>
-        </tr>
-        <tr>
-            <td><span class="badge-false">✗ false</span></td>
-            <td><span class="badge-true">✓ true</span></td>
-            <td style="color: #48cae4; font-weight: bold;">Començar de 0</td>
-            <td>Principiants absoluts que volen aprendre a programar de debò: fonaments, lògica. <br><br>
-                <a href="/customers" class="btn-action">Ver Ruta Code Foundations</a>
+
+            <!-- Columna 3: Título del Perfil / Objetivo Oficial -->
+            <td style="color: #48cae4; font-weight: bold;">
+                <span th:if="${estado.index == 0}">Pujar de nivell (DDD Mastery)</span>
+                <span th:if="${estado.index == 1}">Usar AI per crear projectes (AI Shipping)</span>
+                <span th:if="${estado.index == 2}">Començar de 0 (Code Foundations)</span>
+                <span th:if="${estado.index == 3}">Curs introductori d'arquitectura (Tech Literacy)</span>
             </td>
-        </tr>
-        <tr>
-            <td><span class="badge-false">✗ false</span></td>
-            <td><span class="badge-false">✗ false</span></td>
-            <td style="color: #48cae4; font-weight: bold;">Curs introductori d'arquitectura</td>
-            <td>Product managers, dissenyadors o estudiants que només necessiten parlar el mateix idioma. <br><br>
-                <a href="/customers" class="btn-action">Ver Ruta Tech Literacy</a>
+
+            <!-- Columna 4: Descripciones y Acciones Interactivas de Salto -->
+            <td>
+                <span th:if="${estado.index == 0}">Desenvolupadors amb experiència que volen aprofundir en arquitectura.</span>
+                <span th:if="${estado.index == 1}">Persones que ja saben programar però prioritzen velocitat.</span>
+                <span th:if="${estado.index == 2}">Principiants absoluts que volen aprendre a programar de debò.</span>
+                <span th:if="${estado.index == 3}">Product managers o dissenyadors que necessiten el mateix idioma.</span>
+                <br><br>
+
+                <!-- Cada botón salta a la lista de clientes aplicando el criterio de búsqueda adecuado -->
+                <a th:if="${estado.index == 0}" th:href="@{/customers(buscarTexto='DDD Mastery', criterio='firstName')}" class="btn-action">Ver Clientes Inscritos</a>
+                <a th:if="${estado.index == 1}" th:href="@{/customers(buscarTexto='AI Shipping', criterio='firstName')}" class="btn-action">Ver Clientes Inscritos</a>
+                <a th:if="${estado.index == 2}" th:href="@{/customers(buscarTexto='Code Foundations', criterio='firstName')}" class="btn-action">Ver Clientes Inscritos</a>
+                <a th:if="${estado.index == 3}" th:href="@{/customers(buscarTexto='Tech Literacy', criterio='firstName')}" class="btn-action">Ver Clientes Inscritos</a>
             </td>
         </tr>
         </tbody>

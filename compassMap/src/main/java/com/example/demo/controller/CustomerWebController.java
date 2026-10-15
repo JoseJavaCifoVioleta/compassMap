@@ -1,17 +1,25 @@
 package com.example.demo.controller;
 
+// CABECERAS DE CONTROL (Imports esenciales para que Java reconozca los componentes)
 import com.example.demo.model.Customer;
+import com.example.demo.model.RoadMap; // <-- ¡Dirección del mapa de ruta!
 import com.example.demo.service.CustomerService;
+import com.example.demo.service.RoadMapService; // <-- ¡Dirección del coordinador de rutas!
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import java.util.List; // <-- ¡Dirección de los almacenes List!
+import java.util.ArrayList;
 
 @Controller
 public class CustomerWebController {
@@ -19,11 +27,34 @@ public class CustomerWebController {
     @Autowired
     private CustomerService customerService;
 
+    // Conectamos automáticamente el Coordinador de Estudios para tener acceso a los RoadMaps
+    @Autowired
+    private RoadMapService roadMapService;
+
+    // Ruta de la página de inicio principal (La matriz interactiva de tu profesor)
+    // Ruta de la página de inicio principal (La matriz interactiva de tu profesor)
     @GetMapping({"/", "/index"})
-    public String showIndexPage() {
+    public String showIndexPage(Model model) {
+        System.out.println("Cartero Web: Cargando el catálogo de rutas para el tablero...");
+
+        // Recuperamos las rutas del almacén a través del servicio
+        List<RoadMap> listaRutas = roadMapService.findAll();
+        List<String> listaNombresSeguros = new ArrayList<>();
+
+        // Recorremos las rutas y guardamos su representación para que Thymeleaf pueda leerlas
+        for (RoadMap r : listaRutas) {
+            if (r != null) {
+                // Usamos el reflejo básico de Java para obtener información o su descripción textual
+                listaNombresSeguros.add(r.toString());
+            }
+        }
+
+        // Metemos la lista de textos legibles en la maleta de viaje
+        model.addAttribute("catalogoRutasTexto", listaNombresSeguros);
+
         return "index";
     }
-
+    // Listar clientes de forma ordenada con paginación
     @GetMapping("/customers")
     public String showCustomersPage(
             @RequestParam(defaultValue = "0") int page,
@@ -40,15 +71,12 @@ public class CustomerWebController {
         model.addAttribute("columnaActual", ordenarPor);
         model.addAttribute("siguienteDireccion", direccion.equalsIgnoreCase("asc") ? "desc" : "asc");
 
-        // 1. Configuración del motor de ordenación nativa de Spring Data
-        org.springframework.data.domain.Sort.Direction sentido = direccion.equalsIgnoreCase("desc") ?
-                org.springframework.data.domain.Sort.Direction.DESC : org.springframework.data.domain.Sort.Direction.ASC;
-        org.springframework.data.domain.Sort reglaOrdenacion = org.springframework.data.domain.Sort.by(sentido, ordenarPor);
+        Sort.Direction sentido = direccion.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort reglaOrdenacion = Sort.by(sentido, ordenarPor);
 
-        // 2. LÓGICA DE BÚSQUEDA MULTICAMPO (Con ordenación integrada)
         if (buscarTexto != null && !buscarTexto.trim().isEmpty()) {
-            System.out.println("Cartero Web: Filtrando y Ordenando por [" + criterio + "] con el texto: " + buscarTexto);
-            java.util.List<Customer> resultadosFiltrados;
+            System.out.println("Cartero Web: Filtrando y Ordenando por [" + criterio + "]");
+            List<Customer> resultadosFiltrados;
 
             switch (criterio) {
                 case "lastName":
@@ -69,7 +97,6 @@ public class CustomerWebController {
             return "customers";
         }
 
-        // 3. Si no hay búsqueda, se ejecuta la paginación tradicional con ordenación
         Pageable paginaSolicitada = PageRequest.of(page, size, reglaOrdenacion);
         Page<Customer> paginaDeClientes = customerService.findAllPaginated(paginaSolicitada);
 
@@ -80,47 +107,22 @@ public class CustomerWebController {
         return "customers";
     }
 
-
-
-
-
-    // NUEVA ACCIÓN: Recibir los datos del formulario web y guardarlos de verdad.
     @PostMapping("/customers/save")
     public String saveCustomerFromWeb(@ModelAttribute("nuevoCliente") Customer customer) {
-        System.out.println("Cartero Web: Recibidos datos del formulario para registrar a: " + customer.getFirstName());
-
-        // Guardamos el cliente en el archivador digital a través del servicio
         customerService.createCustomer(customer);
-
-        // Redirigimos al usuario de vuelta a la lista para que vea su nuevo registro al instante
         return "redirect:/customers";
     }
 
-    // NUEVA ACCIÓN: Eliminar un cliente directamente haciendo clic en un enlace de la web
-    // Se activa al pulsar el botón "Eliminar" en la tabla: http://localhost:8080/customers/delete/un-id
     @GetMapping("/customers/delete/{id}")
-    public String deleteCustomerFromWeb(@org.springframework.web.bind.annotation.PathVariable String id) {
-        System.out.println("Cartero Web: Procesando solicitud de baja visual para el código: " + id);
-
-        // Ordenamos al servicio que retire la ficha del archivador
+    public String deleteCustomerFromWeb(@PathVariable String id) {
         customerService.deleteCustomer(id);
-
-        // Redirigimos de vuelta a la lista actualizada
         return "redirect:/customers";
     }
 
-    // NUEVA ACCIÓN: Abrir la pantalla con el formulario para modificar los datos de un cliente
-    // Se activa al pulsar el botón "Editar": http://localhost:8080/customers/edit/un-id
     @GetMapping("/customers/edit/{id}")
-    public String showEditPage(@org.springframework.web.bind.annotation.PathVariable String id, Model model) {
-        System.out.println("Cartero Web: Abriendo la pantalla de edición para el código: " + id);
-
-        // Localizamos los datos actuales del cliente para meterlos en la maleta
+    public String showEditPage(@PathVariable String id, Model model) {
         Customer clienteExistente = customerService.getCustomerById(id);
         model.addAttribute("clienteAEditar", clienteExistente);
-
-        // Viajamos a la nueva pantalla de edición
         return "edit-customer";
     }
-
 }
