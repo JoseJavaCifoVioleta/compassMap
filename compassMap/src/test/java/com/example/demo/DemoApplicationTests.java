@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.data.domain.Sort; // <-- Importante para las nuevas pruebas de ordenación
+import com.example.demo.model.RoadMap;
 
 import java.util.List;
 import java.util.UUID;
@@ -168,4 +169,28 @@ class DemoApplicationTests {
 		assertNotNull(resultado);
 		System.out.println("Laboratorio: Motor de ordenación validado en verde.");
 	}
+
+	@Autowired
+	private com.example.demo.service.RoadMapService roadMapService;
+
+	// Prueba 13: Verificación de almacenamiento y recuperación de guías de estudio (RoadMap)
+	@Test
+	@org.springframework.transaction.annotation.Transactional
+	@org.springframework.test.annotation.Rollback
+	void testRoadMapPersistence() {
+		System.out.println("Laboratorio: Verificando persistencia de mapas de aprendizaje...");
+
+		// 1. Creamos una guía de estudio de prueba
+		RoadMap mapaPrueba = new RoadMap("DDD Mastery Test", "Domain-Driven Design deep dive para pruebas", 8, false);
+
+		// 2. Intentamos guardarla en el almacén a través del nuevo servicio
+		RoadMap guardado = roadMapService.createRoadMap(mapaPrueba);
+		org.junit.jupiter.api.Assertions.assertNotNull(guardado);
+
+		// 3. Verificamos que el sistema incrementa el conteo de mapas
+		long cantidad = roadMapService.countRoadMaps();
+		org.junit.jupiter.api.Assertions.assertTrue(cantidad > 0);
+		System.out.println("Laboratorio: Hoja de ruta guardada con éxito. Conteo actual en almacén: " + cantidad);
+	}
+
 }

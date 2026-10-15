@@ -1,0 +1,16 @@
+🗺️ El Objetivo de la Fase 4: Sincronizar la Matriz de Perfiles
+
+Cada una de las 4 opciones (*Pujar de nivell*, *Començar de 0*...) corresponde exactamente a una de las fichas de la clase **`**RoadMap.java**`** forkeada en local.
+
+Para que esa matriz deje de tener textos estáticos fijos y pase a ser **100% dinámica** (leyendo las rutas reales guardadas en la base de datos H2), seguiremos de forma estricta nuestra metodología incremental diaria y nuestra **Regla de Oro** (Código ➡️ Test JUnit ➡️ Commit).
+
+🗄️ Iteración 11: La Persistencia de Hojas de Ruta (**`**RoadMap**`**)
+
+-   **Paso 11.1 (Código):** Crearemos la interfaz **`**RoadMapRepository.java**`** extendiendo de `JpaRepository` para que Spring Boot gestione el archivador de rutas automáticamente sin picar SQL.
+-   **Paso 11.2 (Código):** Crearemos la clase **`**RoadMapService.java**`** (el "Director de Rutas") con los métodos básicos para guardar, contar y listar todas las guías de aprendizaje.
+-   **Paso 11.3 (Prueba Unitaria):** Añadiremos un nuevo test en `DemoApplicationTests.java` para verificar que el sistema es capaz de almacenar y recuperar una hoja de ruta (ejemplo: *"DDD Mastery"*) de forma aislada.
+
+🌱 Iteración 12: Semillado Seguro de Rutas y Conexión Base
+
+-   **Paso 12.1 (Código):** Modificaremos el cargador automático **`**PopulatorDB.java**`** para que, al encenderse la aplicación, inyecte las 4 rutas base del profesor controlando mediante código que **no se dupliquen** si el servidor se reinicia.
+-   **Paso 12.2 (Prueba Unitaria):** Crearemos un test que certifique que tras el arranque, el archivador contiene exactamente las guías iniciales requeridas.
