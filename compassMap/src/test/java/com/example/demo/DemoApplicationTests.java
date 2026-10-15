@@ -204,11 +204,12 @@ class DemoApplicationTests {
 		// 2. Llamamos al método del inicio
 		String vistaObtenida = customerWebController.showIndexPage(maletaInicio);
 
-		// 3. Certificamos que la maleta contiene las rutas cargadas y apunta a 'index'
+		// 3. CORRECCIÓN: Certificamos que la maleta contiene la nueva variable de textos seguros
 		org.junit.jupiter.api.Assertions.assertEquals("index", vistaObtenida);
-		org.junit.jupiter.api.Assertions.assertNotNull(maletaInicio.getAttribute("catalogoRutas"));
+
+		// ACTUALIZADO: Cambiamos "catalogoRutas" por "catalogoRutasTexto" para coincidir con el controlador
+		org.junit.jupiter.api.Assertions.assertNotNull(maletaInicio.getAttribute("catalogoRutasTexto"));
+
 		System.out.println("Laboratorio: Flujo del tablero principal validado con éxito.");
 	}
-
-
 }

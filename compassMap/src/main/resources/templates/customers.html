@@ -4,32 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CompassMap - Panel de Clientes</title>
-    <style>
-        /* ESTILOS DE CONTROL LOCAL: Carga instantánea y diseño limpio */
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
-        .wrapper { max-width: 1300px; margin: 0 auto; }
-        .card-contenedor { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 25px; border: 1px solid #e1e8ed; }
-        h1 { color: #2c3e50; margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid #00b4d8; font-size: 1.8rem; }
-
-        /* Buscador adaptativo */
-        .search-form { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
-        .search-form input { flex: 1; min-width: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95rem; }
-        .btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; font-size: 0.95rem; }
-        .btn-info { background-color: #00b4d8; color: white; }
-        .btn-secondary { background-color: #7f8c8d; color: white; }
-        .btn-warning { background-color: #f39c12; color: white; }
-        .btn-danger { background-color: #e74c3c; color: white; }
-        .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
-
-        /* Contenedor Adaptativo Móvil para la Tabla */
-        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 6px; border: 1px solid #dee2e6; }
-        table { width: 100%; border-collapse: collapse; text-align: left; background: white; min-width: 900px; }
-        th, td { padding: 12px 15px; border-bottom: 1px solid #dee2e6; font-size: 0.9rem; }
-        th { background-color: #1c2541; color: white; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
-        tr:hover { background-color: #f8f9fa; }
-        .tabla-codigo { font-family: monospace; color: #7f8c8d; font-size: 0.8rem; }
-        .actions-cell { display: flex; gap: 6px; justify-content: center; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
 </head>
 <body>
 

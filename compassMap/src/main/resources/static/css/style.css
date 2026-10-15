@@ -1,0 +1,240 @@
+/* ==========================================================================
+   PALETA DE COLORES CYBER-MAP (Estética de la Matriz Oscura)
+   ========================================================================== */
+:root {
+    --bg-main: #0b132b;       /* Fondo oscuro general */
+    --bg-card: #1c2541;       /* Fondo de contenedores y tarjetas */
+    --text-main: #ffffff;     /* Texto principal */
+    --text-muted: #95a5a6;    /* Texto secundario */
+    --cyan-accent: #48cae4;   /* Color cian de títulos y enlaces */
+    --btn-info: #00b4d8;      /* Azul de botones de filtrar */
+    --btn-success: #2a9d8f;   /* Verde de guardar/añadir */
+    --btn-warning: #f39c12;   /* Naranja de editar */
+    --btn-danger: #e63946;    /* Rojo de eliminar */
+    --border-color: #3a506b;  /* Líneas divisorias */
+}
+
+/* Estilos Base */
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Tarjetas y Contenedores */
+.card-contenedor {
+    background-color: var(--bg-card);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+}
+
+h1 {
+    color: var(--cyan-accent);
+    font-size: 2rem;
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+p.muted {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Menú de Navegación Superior */
+.nav-bar {
+    text-align: center;
+    margin-bottom: 25px;
+    padding: 10px;
+    background-color: var(--bg-card);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.nav-link {
+    color: var(--cyan-accent);
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: #00b4d8;
+}
+
+/* Formularios y Cajas de Búsqueda */
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+.search-form select {
+    padding: 10px 30px 10px 12px; /* Añadimos espacio a la derecha */
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background-color: var(--bg-main) !important; /* Fondo azul oscuro de la app */
+    color: #ffffff !important;                   /* Texto blanco nítido */
+
+    /* EL TRUCO MAESTRO: Rompe el diseño nativo del navegador para que acepte nuestro CSS */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    /* Añadimos una pequeña flecha cian limpia hecha con código para que se note que es un desplegable */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='10' height='10' viewBox='0 0 10 10'><path fill='%2348cae4' d='M0 3l5 5 5-5z'/></svg>") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    cursor: pointer;
+}
+.search-form select option {
+    background-color: #1c2541 !important; /* Fondo azul tarjeta */
+    color: #ffffff !important;            /* Texto blanco impecable */
+    padding: 10px;
+}
+.search-form input, .form-group input {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background-color: #0b132b;
+    color: white;
+}
+
+.search-form input {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Botones Universales */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    font-size: 0.95rem;
+    display: inline-block;
+    transition: background 0.3s, transform 0.1s;
+}
+
+.btn:active { transform: scale(0.98); }
+.btn-info { background-color: var(--btn-info); color: white; }
+.btn-secondary { background-color: #5c677d; color: white; }
+.btn-warning { background-color: var(--btn-warning); color: white; }
+.btn-danger { background-color: var(--btn-danger); color: white; }
+.btn-success { background-color: var(--btn-success); color: white; }
+.btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+
+/* Tabla Responsiva y Adaptable */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th, td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+th {
+    color: var(--cyan-accent);
+    background-color: #111a36;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+tr:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.tabla-codigo {
+    font-family: monospace;
+    color: var(--text-muted);
+}
+
+.actions-cell {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.badge-true { background-color: var(--btn-success); color: white; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
+.badge-false { background-color: var(--btn-danger); color: white; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
+
+/* ==========================================================================
+   MEDIA QUERIES (Soporte adaptable para Móviles y Tablets)
+   ========================================================================== */
+@media (max-width: 768px) {
+    body { padding: 10px; }
+    .card-contenedor { padding: 15px; }
+    h1 { font-size: 1.5rem; }
+
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-form select, .search-form input, .search-form option {
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 0.95rem;
+        background-color: var(--bg-main) !important; /* Forzamos el fondo azul oscuro de la app */
+        color: #ffffff !important;                   /* Forzamos el texto en blanco nítido */
+    }
+
+
+    /* Transformación del formulario manual a bloque completo */
+    .form-group input { width: 100% !important; box-sizing: border-box; }
+}
+
+/* Forzamos que cualquier contenedor de formulario manual adopte el look Cyberpunk */
+div[style*="background: white"], div[style*="background:white"] {
+    background-color: var(--bg-card) !important; /* Cambiamos fondo blanco por azul tarjeta */
+    color: var(--text-main) !important;          /* Texto en blanco */
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Ajustamos las etiquetas y campos de entrada de texto dentro del formulario */
+form label {
+    color: var(--cyan-accent) !important; /* Etiquetas del formulario en color cian nítido */
+}
+
+form input[type="text"], form input[type="email"] {
+    background-color: var(--bg-main) !important;
+    color: white !important;
+    border: 1px solid var(--border-color) !important;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+form input::placeholder {
+    color: var(--text-muted);
+}
