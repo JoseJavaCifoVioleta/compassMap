@@ -7,53 +7,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.env.Environment;
 
 @SpringBootApplication
-public class DemoApplication  implements CommandLineRunner {
+public class DemoApplication implements CommandLineRunner {
 
 	@Autowired
-	PopulatorDB populatorDB;
+	private PopulatorDB populatorDB;
 
 	@Autowired
-	private CustomerService customerService; // Añadimos el servicio aquí arriba si no estaba
+	private CustomerService customerService;
 
 	@Autowired
-	private org.springframework.core.env.Environment environment;
-
-	//@Autowired
-	//BackOffice backOffice;
+	private Environment environment;
 
 	public static void main(String[] args) {
-
 		SpringApplication.run(DemoApplication.class, args);
 	}
 
 	@Override
 	public void run(String... args) throws Exception {
+		// Al arrancar, ejecutamos de forma automática el semillado de clientes y rutas
+		populatorDB.createAndSaveCustomer(100);
+		populatorDB.populateRoadmaps();
 
-		// JAVA SE strategy with STATIC methods
-		// SO we call the class and then
-		// the method
-		//BackOffice.startBackOffice(populatorDB);
-		// Le pasamos tanto la fábrica de datos como el director del archivador
-		//BackOffice.startBackOffice(populatorDB, customerService);
-
-		// JAVA EE, Spring Boot tools
-		// with @Autowired and DI
-		//backOffice.startMenu(populatorDB);
-
-
-		// Preguntamos al sistema: ¿Estamos ejecutando pruebas automatizadas (modo test)?
-		// Al hacer los tests, Spring Boot activa un perfil especial por defecto.
+		// Si detectamos el perfil de laboratorio, bloqueamos el menú para no congelar los tests
 		for (String profile : environment.getActiveProfiles()) {
 			if (profile.equalsIgnoreCase("test")) {
-				System.out.println("Oficina: Detectado entorno de laboratorio (Test). Bloqueamos el menú para no atascar el proceso.");
-				return; // Salimos del método inmediatamente sin abrir la consola
+				System.out.println("Oficina: Entorno de laboratorio activo. Menú omitido.");
+				return;
 			}
 		}
 
-		// Si no estamos en un test, el programa continuará aquí y abrirá el menú interactivo para el usuario
+		// Inicio normal del menú por consola
 		BackOffice.startBackOffice(populatorDB, customerService);
 	}
-
 }
