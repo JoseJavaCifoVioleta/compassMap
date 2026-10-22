@@ -1,8 +1,12 @@
 package com.example.demo.utils;
 
 import com.example.demo.model.Customer;
-import com.example.demo.service.CustomerService;
+import com.example.demo.model.CustomerProfile;
+import com.example.demo.model.RoadMap;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Scanner;
 
 public class BackOffice {
@@ -28,10 +32,10 @@ public class BackOffice {
                     customerLoop(scan, populatorDB);
                     break;
                 case "2":
-                    System.out.println("Roadmap - not implemented yet.");
+                    roadMapLoop(scan, populatorDB);
                     break;
                 case "3":
-                    System.out.println("Profile - not implemented yet.");
+                    profileLoop(scan, populatorDB);
                     break;
                 case "4":
                     System.out.println("Goodbye!");
@@ -91,15 +95,120 @@ public class BackOffice {
         }
     }
 
-    public static void roadMapLoop(Scanner scan){
-        while(true){
+    public static void roadMapLoop(Scanner scan, PopulatorDB populatorDB){
+        boolean inRoadMapMenu = true;
+        while(inRoadMapMenu){
+            roadMapMenu();
             String option = askMenuOption(scan);
             switch (option){
-                // we should implement the option for roadMap entity
-                // populate the roadMap table with synthetic data
-                // and call the roadMap service to delete and count
+                case "1":
+                    List<RoadMap> created = populatorDB.createAndSaveRoadMap();
+                    System.out.println(created.size() + " roadmaps created and saved.");
+                    break;
+                case "2":
+                    printRoadMapTable(populatorDB.roadMapService.getAllRoadMapsAsList(), false);
+                    break;
+                case "3":
+                    printRoadMapTable(populatorDB.roadMapService.getAllRoadMapsAsList(), true);
+                    break;
+                case "4":
+                    System.out.print("Roadmap ID: ");
+                    String getId = scan.nextLine();
+                    RoadMap found = populatorDB.roadMapService.getRoadMapById(getId);
+                    System.out.println(found != null ? found : "Not found");
+                    break;
+                case "5":
+                    System.out.print("Roadmap ID to delete: ");
+                    String id = scan.nextLine();
+                    populatorDB.roadMapService.deleteRoadMap(id);
+                    System.out.println("Roadmap " + id + " deleted.");
+                    break;
+                case "6":
+                    populatorDB.roadMapService.deleteAllRoadMaps();
+                    System.out.println("All roadmaps deleted.");
+                    break;
+                case "7":
+                    long total = populatorDB.roadMapService.countRoadMaps();
+                    System.out.println("Total roadmaps: " + total);
+                    break;
+                case "8":
+                    inRoadMapMenu = false;
+                    break;
+                default:
+                    System.out.println("Invalid option, try again.");
             }
         }
+    }
+
+    public static void profileLoop(Scanner scan, PopulatorDB populatorDB) {
+        boolean inProfileMenu = true;
+        while (inProfileMenu) {
+            profileMenu();
+            String option = askMenuOption(scan);
+            switch (option) {
+                case "1":
+                    List<CustomerProfile> created = populatorDB.createAndSaveCustomerProfiles();
+                    System.out.println(created.size() + " profiles created and saved.");
+                    break;
+                case "2":
+                    Iterable<CustomerProfile> all = populatorDB.customerProfileService.getAllCustomerProfiles();
+                    int i = 0;
+                    for (CustomerProfile p : all) {
+                        System.out.print("#" + ++i + ": ");
+                        System.out.println(p);
+                    }
+                    break;
+                case "3":
+                    System.out.print("Profile ID: ");
+                    String getId = scan.nextLine();
+                    CustomerProfile found = populatorDB.customerProfileService.getCustomerProfileById(getId);
+                    System.out.println(found != null ? found : "Not found");
+                    break;
+                case "4":
+                    System.out.print("Profile ID to delete: ");
+                    String id = scan.nextLine();
+                    populatorDB.customerProfileService.deleteCustomerProfile(id);
+                    System.out.println("Profile " + id + " deleted.");
+                    break;
+                case "5":
+                    populatorDB.customerProfileService.deleteAllCustomerProfiles();
+                    System.out.println("All profiles deleted.");
+                    break;
+                case "6":
+                    long total = populatorDB.customerProfileService.countCustomerProfiles();
+                    System.out.println("Total profiles: " + total);
+                    break;
+                case "7":
+                    inProfileMenu = false;
+                    break;
+                default:
+                    System.out.println("Invalid option, try again.");
+            }
+        }
+    }
+
+    // prints roadmaps as a formatted table, sorted by steps (descending)
+    // when pendingOnly is true it filters out completed roadmaps using streams
+    public static void printRoadMapTable(List<RoadMap> roadMaps, boolean pendingOnly) {
+        List<RoadMap> roadMapsToPrint = new ArrayList<>();
+        roadMaps.forEach(roadMapsToPrint::add);
+
+        if (pendingOnly) {
+            long pending = roadMapsToPrint.stream()
+                    .filter(r -> !Boolean.TRUE.equals(r.isCompleted()))
+                    .count();
+            System.out.println("\nPending roadmaps: " + pending);
+        }
+
+        System.out.printf("%-20s %-35s %5s %9s%n", "NAME", "DESCRIPTION", "STEPS", "DONE");
+        System.out.println("-".repeat(72));
+
+        roadMapsToPrint.stream()
+                .filter(r -> !pendingOnly || !Boolean.TRUE.equals(r.isCompleted()))
+                .sorted(Comparator.comparingInt((RoadMap r) -> r.getSteps() == null ? 0 : r.getSteps()).reversed())
+                .forEach(r -> System.out.printf("%-20s %-35s %5d %9s%n",
+                        r.getName(), r.getDescription(), r.getSteps() == null ? 0 : r.getSteps(),
+                        Boolean.TRUE.equals(r.isCompleted()) ? "OK" : "-"));
     }
 
     public static void customerMenu() {
@@ -110,6 +219,29 @@ public class BackOffice {
         System.out.println("4. Delete customer");
         System.out.println("5. Delete all customers");
         System.out.println("6. Count customers");
+        System.out.println("7. Quit");
+    }
+
+    public static void roadMapMenu() {
+        System.out.println("\n===== ROADMAP MENU =====");
+        System.out.println("1. Create roadmaps");
+        System.out.println("2. Get all roadmaps");
+        System.out.println("3. Get pending roadmaps");
+        System.out.println("4. Get roadmap by Id");
+        System.out.println("5. Delete roadmap");
+        System.out.println("6. Delete all roadmaps");
+        System.out.println("7. Count roadmaps");
+        System.out.println("8. Quit");
+    }
+
+    public static void profileMenu() {
+        System.out.println("\n===== PROFILE MENU =====");
+        System.out.println("1. Create profiles");
+        System.out.println("2. Get all profiles");
+        System.out.println("3. Get profile by Id");
+        System.out.println("4. Delete profile");
+        System.out.println("5. Delete all profiles");
+        System.out.println("6. Count profiles");
         System.out.println("7. Quit");
     }
 

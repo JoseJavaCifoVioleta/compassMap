@@ -34,7 +34,7 @@ public class CustomerProfile {
 
     public String toString() {
         return String.format(
-                "Profile[id=%s, name='%s']",
-                id, name);
+                "CustomerProfile[id=%s, codeProfile=%s, name='%s', description='%s', goal='%s']",
+                id, codeProfile, name, description, goal);
     }
 }
