@@ -230,6 +230,13 @@ public class PopulatorDB {
         return customerProfiles;
     }
     public List<CustomerProfile> createAndSaveCustomerProfiles() {
-        return createAndSaveCustomerProfiles();
+        // 1. Generamos la lista con los 16 perfiles que escribiste arriba
+        List<CustomerProfile> profiles = createCustomerProfiles();
+
+        // 2. Los guardamos en la base de datos usando el servicio inyectado
+        customerProfileService.saveAll(profiles);
+
+        // 3. Devolvemos la lista
+        return profiles;
     }
 }
