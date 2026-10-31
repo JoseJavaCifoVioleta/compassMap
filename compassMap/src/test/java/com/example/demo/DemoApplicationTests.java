@@ -2,8 +2,10 @@ package com.example.demo;
 
 import com.example.demo.model.Answer;
 import com.example.demo.model.Customer;
+import com.example.demo.model.Dimension;
 import com.example.demo.model.Question;
 import com.example.demo.model.QuestionAndAnswer;
+import com.example.demo.repository.AnswerRepository;
 import com.example.demo.repository.QuestionAndAnswerRepository;
 import com.example.demo.repository.QuestionRepository;
 import com.example.demo.service.CustomerService;
@@ -11,6 +13,12 @@ import com.github.javafaker.Faker;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 class DemoApplicationTests {
@@ -23,6 +31,8 @@ class DemoApplicationTests {
 	private QuestionAndAnswerRepository repositoryQuestionAndAnswer;
 	@Autowired
 	private QuestionRepository repositoryQuestion;
+	@Autowired
+	private AnswerRepository repositoryAnswer;
 
 	@Test
 	void contextLoads() {
@@ -74,45 +84,53 @@ class DemoApplicationTests {
 	}
 
 	@Test
-	void questionAndAnswerTentative(){
+	@Transactional
+	void questionAndAnswerManyToOneSharesAnswerAndPersistsForeignKeys() {
 
-		/*
- 		{
-			"id": "7504a93c-a16c-4438-a140-4ae7dd326631",
-			"name": "q-001",
-			"text": "Have you written code in any language before?",
-			"dimension": "KNOWS_CODE",
-			"order": 1,
-			"weight": 1.0
-    	},
-		 */
+		// 1. the Question catalogue row must exist first (FK question_id)
+		Question question = Question.builder()
+				.id(UUID.randomUUID().toString())
+				.name("q-test")
+				.text("Have you written code in any language before?")
+				.dimension(Dimension.KNOWS_CODE)
+				.order(999)
+				.weight(1.0)
+				.build();
+		repositoryQuestion.save(question);
 
-		// the test must fetch a question
-		Question question = repositoryQuestion.findById("7504a93c-a16c-4438-a140-4ae7dd326631").orElse(null);
-		System.out.println("Question fetched: " + question);
-		// and then create an empty questionAndAnswer
-		QuestionAndAnswer qa1 = new QuestionAndAnswer();
-		// set it with id q-001
-		qa1.setId("qa-001");
-		// set it with question
-		qa1.setQuestion(question);
-		// set it with answer a-001
-		Answer answer = new Answer();
-		answer.setId("a-001");
-		answer.setValue(true);
-		qa1.setAnswer(answer);
-		// set contribution
-		qa1.setScoreContribution(1.0);
- 		// and then save it
+		// 2. the Answer catalogue row must exist first (FK answer_id)
+		Answer answer = Answer.builder()
+				.id(UUID.randomUUID().toString())
+				.value(true)
+				.build();
+		repositoryAnswer.save(answer);
+
+		// 3. two Q&A rows share the SAME Answer -> proves @ManyToOne (n..1)
+		QuestionAndAnswer qa1 = QuestionAndAnswer.builder()
+				.id(UUID.randomUUID().toString())
+				.question(question)
+				.answer(answer)
+				.scoreContribution(1.0)
+				.build();
+		QuestionAndAnswer qa2 = QuestionAndAnswer.builder()
+				.id(UUID.randomUUID().toString())
+				.question(question)
+				.answer(answer)
+				.scoreContribution(2.0)
+				.build();
 		repositoryQuestionAndAnswer.save(qa1);
-		// and then fetch it
-		QuestionAndAnswer questionAndAnswerFound = repositoryQuestionAndAnswer.findById("qa-001").orElse(null);
-		System.out.println("QuestionAndAnswer found: " + questionAndAnswerFound);
-		// optionally, delete it
-		//repositoryQuestionAndAnswer.deleteById("q-001");
-		//System.out.println("QuestionAndAnswer exists after delete: " + repositoryQuestionAndAnswer.existsById("q-001"));
+		repositoryQuestionAndAnswer.save(qa2);
+
+		// 4. read back: the FK values are the ids of the referenced rows
+		QuestionAndAnswer found = repositoryQuestionAndAnswer.findById(qa1.getId()).orElse(null);
+		assertNotNull(found);
+		assertEquals(question.getId(), found.getQuestion().getId());
+		assertEquals(answer.getId(), found.getAnswer().getId());
+		assertEquals(1.0, found.getScoreContribution());
+
+		// 5. derived queries traverse the associations
+		assertEquals(2, repositoryQuestionAndAnswer.findByQuestionId(question.getId()).size());
+		assertEquals(2, repositoryQuestionAndAnswer.findByAnswerId(answer.getId()).size());
 	}
-
-
 
 }
