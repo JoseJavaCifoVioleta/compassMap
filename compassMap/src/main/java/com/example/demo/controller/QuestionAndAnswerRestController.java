@@ -1,9 +1,12 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.QuestionAndAnswerRequest;
 import com.example.demo.model.QuestionAndAnswer;
 import com.example.demo.service.QuestionAndAnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 // REST Controller is a annotation that marks the class as a controller
 // that is a component that handles HTTP requests
@@ -17,27 +20,26 @@ public class QuestionAndAnswerRestController {
     private QuestionAndAnswerService questionAndAnswerService;
 
     //----------------------------- CREATE -----------------------------
+    // Body: { "questionId": "...", "answerId": "...", "scoreContribution": 2.5 }
     @PostMapping("/create")
-    public QuestionAndAnswer createQuestionAndAnswer(@RequestBody QuestionAndAnswer questionAndAnswer) {
-        QuestionAndAnswer newQuestionAndAnswer = questionAndAnswerService.createQuestionAndAnswer(questionAndAnswer);
+    public QuestionAndAnswer createQuestionAndAnswer(@RequestBody QuestionAndAnswerRequest request) {
+        QuestionAndAnswer newQuestionAndAnswer = questionAndAnswerService.createQuestionAndAnswer(request);
         System.out.println("Service createQuestionAndAnswer: " + newQuestionAndAnswer);
         return newQuestionAndAnswer;
     }
 
     @PostMapping("/createAll")
-    public Iterable<QuestionAndAnswer> createAllQuestionAndAnswers(@RequestBody Iterable<QuestionAndAnswer> questionAndAnswers) {
-        Iterable<QuestionAndAnswer> newQuestionAndAnswers = questionAndAnswerService.saveAll(questionAndAnswers);
-        System.out.println("Service createAllQuestionAndAnswers: " + questionAndAnswers);
+    public Iterable<QuestionAndAnswer> createAllQuestionAndAnswers(@RequestBody Iterable<QuestionAndAnswerRequest> requests) {
+        Iterable<QuestionAndAnswer> newQuestionAndAnswers = questionAndAnswerService.saveAll(requests);
+        System.out.println("Service createAllQuestionAndAnswers: " + newQuestionAndAnswers);
         return newQuestionAndAnswers;
     }
 
     //----------------------------- UPDATE -----------------------------
+    // Body: { "id": "...", "scoreContribution": 4.5 }  (partial update)
     @PutMapping("/update")
-    public QuestionAndAnswer updateQuestionAndAnswer(@RequestBody QuestionAndAnswer questionAndAnswer) {
-        if (questionAndAnswer.getId() == null || questionAndAnswerService.getQuestionAndAnswerById(questionAndAnswer.getId()) == null) {
-            return null;
-        }
-        QuestionAndAnswer updatedQuestionAndAnswer = questionAndAnswerService.updateQuestionAndAnswer(questionAndAnswer);
+    public QuestionAndAnswer updateQuestionAndAnswer(@RequestBody QuestionAndAnswerRequest request) {
+        QuestionAndAnswer updatedQuestionAndAnswer = questionAndAnswerService.updateQuestionAndAnswer(request);
         System.out.println("Service updateQuestionAndAnswer: " + updatedQuestionAndAnswer);
         return updatedQuestionAndAnswer;
     }
@@ -58,6 +60,22 @@ public class QuestionAndAnswerRestController {
         return questionAndAnswer;
     }
 
+    // Traverses the @ManyToOne question association (question_id FK).
+    @GetMapping("/byQuestionId")
+    public List<QuestionAndAnswer> getQuestionAndAnswersByQuestionId(@RequestParam String questionId) {
+        List<QuestionAndAnswer> questionAndAnswers = questionAndAnswerService.getQuestionAndAnswersByQuestionId(questionId);
+        System.out.println("Service getQuestionAndAnswersByQuestionId: " + questionAndAnswers);
+        return questionAndAnswers;
+    }
+
+    // Traverses the @ManyToOne answer association (answer_id FK).
+    @GetMapping("/byAnswerId")
+    public List<QuestionAndAnswer> getQuestionAndAnswersByAnswerId(@RequestParam String answerId) {
+        List<QuestionAndAnswer> questionAndAnswers = questionAndAnswerService.getQuestionAndAnswersByAnswerId(answerId);
+        System.out.println("Service getQuestionAndAnswersByAnswerId: " + questionAndAnswers);
+        return questionAndAnswers;
+    }
+
     @GetMapping("/count")
     public long countQuestionAndAnswers() {
         long count = questionAndAnswerService.countQuestionAndAnswers();
@@ -68,13 +86,10 @@ public class QuestionAndAnswerRestController {
     //----------------------------- DELETE -----------------------------
     @DeleteMapping("/byId")
     public QuestionAndAnswer deleteById(@RequestParam String id) {
+        // getQuestionAndAnswerById throws NoSuchElementException -> 404
         QuestionAndAnswer foundQuestionAndAnswer = questionAndAnswerService.getQuestionAndAnswerById(id);
-        if (foundQuestionAndAnswer == null) return null;
-        else {
-            questionAndAnswerService.deleteQuestionAndAnswer(id);
-            return foundQuestionAndAnswer;
-        }
-
+        questionAndAnswerService.deleteQuestionAndAnswer(id);
+        return foundQuestionAndAnswer;
     }
 
     @DeleteMapping("/all")
