@@ -1,0 +1,479 @@
+{
+  "info": {
+    "_postman_id": "b7b1f3a2-5c1a-4f6e-9d2e-c0a1e5d4a001",
+    "name": "compassMap · Task 1 · QuestionAndAnswer",
+    "description": "Task 1 — QuestionAndAnswer as an @Entity linked to Question and Answer via @ManyToOne.\n\nHow to use it:\n1. Start the Spring Boot app (port 8080 by default).\n2. Import this collection in Postman.\n3. Run the folder 'Task 1 — QuestionAndAnswer' with the Collection Runner, IN ORDER (the requests save ids in collection variables).\n\nThe collection covers the happy path (create question, create answers, create Q&A, read, update, delete) and two negative cases (400 unknown question / missing answer id) plus a 404 after delete.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "questionId",
+      "value": ""
+    },
+    {
+      "key": "answerTrueId",
+      "value": ""
+    },
+    {
+      "key": "answerFalseId",
+      "value": ""
+    },
+    {
+      "key": "qaId",
+      "value": ""
+    },
+    {
+      "key": "qa2Id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Task 1 — QuestionAndAnswer",
+      "item": [
+        {
+          "name": "00 · Context · questions count",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('count is a number', () => pm.expect(pm.response.json()).to.be.a('number'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questions/count",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "questions", "count"]
+            }
+          }
+        },
+        {
+          "name": "01 · Answer · create TRUE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('answer has a generated id', () => pm.expect(body.id).to.be.a('string').and.not.empty);",
+                  "pm.test('answer value is true', () => pm.expect(body.value).to.eql(true));",
+                  "pm.collectionVariables.set('answerTrueId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/answers/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "answers", "create"]
+            }
+          }
+        },
+        {
+          "name": "02 · Answer · create FALSE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('answer value is false', () => pm.expect(body.value).to.eql(false));",
+                  "pm.collectionVariables.set('answerFalseId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": false\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/answers/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "answers", "create"]
+            }
+          }
+        },
+        {
+          "name": "03 · Question · create",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('question has a generated id', () => pm.expect(body.id).to.be.a('string').and.not.empty);",
+                  "pm.test('name is derived from order', () => pm.expect(body.name).to.eql('q-101'));",
+                  "pm.collectionVariables.set('questionId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Do you know what a JPA relationship is?\",\n  \"dimension\": \"KNOWS_CODE\",\n  \"order\": 101,\n  \"weight\": 1.0\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questions/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "questions", "create"]
+            }
+          }
+        },
+        {
+          "name": "04 · Q&A · create (question + answer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Q&A has a generated id', () => pm.expect(body.id).to.be.a('string').and.not.empty);",
+                  "pm.test('FK question_id points to the created question', () => pm.expect(body.question.id).to.eql(pm.collectionVariables.get('questionId')));",
+                  "pm.test('FK answer_id points to the created answer', () => pm.expect(body.answer.id).to.eql(pm.collectionVariables.get('answerTrueId')));",
+                  "pm.test('scoreContribution is persisted', () => pm.expect(body.scoreContribution).to.eql(2.5));",
+                  "pm.collectionVariables.set('qaId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": \"{{questionId}}\",\n  \"answerId\": \"{{answerTrueId}}\",\n  \"scoreContribution\": 2.5\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questionAndAnswers/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "questionAndAnswers", "create"]
+            }
+          }
+        },
+        {
+          "name": "05 · Q&A · get by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('id matches', () => pm.expect(body.id).to.eql(pm.collectionVariables.get('qaId')));",
+                  "pm.test('question is loaded through the FK', () => pm.expect(body.question.id).to.eql(pm.collectionVariables.get('questionId')));",
+                  "pm.test('answer is loaded through the FK', () => pm.expect(body.answer.id).to.eql(pm.collectionVariables.get('answerTrueId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questionAndAnswers/byId?id={{qaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "questionAndAnswers", "byId"],
+              "query": [{ "key": "id", "value": "{{qaId}}" }]
+            }
+          }
+        },
+        {
+          "name": "06 · Q&A · get all",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('response is an array', () => pm.expect(body).to.be.an('array'));",
+                  "pm.test('contains the created Q&A', () => pm.expect(body.map(qa => qa.id)).to.include(pm.collectionVariables.get('qaId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questionAndAnswers/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "questionAndAnswers", "all"]
+            }
+          }
+        },
+        {
+          "name": "07 · Q&A · get by questionId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('derived query returns at least one row', () => pm.expect(body.length).to.be.at.least(1));",
+                  "pm.test('every row points to the question', () => body.forEach(qa => pm.expect(qa.question.id).to.eql(pm.collectionVariables.get('questionId'))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questionAndAnswers/byQuestionId?questionId={{questionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "questionAndAnswers", "byQuestionId"],
+              "query": [{ "key": "questionId", "value": "{{questionId}}" }]
+            }
+          }
+        },
+        {
+          "name": "08 · Q&A · get by answerId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('derived query returns at least one row', () => pm.expect(body.length).to.be.at.least(1));",
+                  "pm.test('every row points to the answer', () => body.forEach(qa => pm.expect(qa.answer.id).to.eql(pm.collectionVariables.get('answerTrueId'))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questionAndAnswers/byAnswerId?answerId={{answerTrueId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "questionAndAnswers", "byAnswerId"],
+              "query": [{ "key": "answerId", "value": "{{answerTrueId}}" }]
+            }
+          }
+        },
+        {
+          "name": "09 · Q&A · update score only (partial update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('scoreContribution was updated', () => pm.expect(body.scoreContribution).to.eql(4.5));",
+                  "pm.test('relations were NOT nulled by the partial update', () => {",
+                  "  pm.expect(body.question.id).to.eql(pm.collectionVariables.get('questionId'));",
+                  "  pm.expect(body.answer.id).to.eql(pm.collectionVariables.get('answerTrueId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{qaId}}\",\n  \"scoreContribution\": 4.5\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questionAndAnswers/update",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "questionAndAnswers", "update"]
+            }
+          }
+        },
+        {
+          "name": "10 · Q&A · second row reusing the same Answer (proves n..1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('it is a different Q&A row', () => pm.expect(body.id).to.not.eql(pm.collectionVariables.get('qaId')));",
+                  "pm.test('it reuses the same answer_id', () => pm.expect(body.answer.id).to.eql(pm.collectionVariables.get('answerTrueId')));",
+                  "pm.collectionVariables.set('qa2Id', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": \"{{questionId}}\",\n  \"answerId\": \"{{answerTrueId}}\",\n  \"scoreContribution\": 1.0\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questionAndAnswers/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "questionAndAnswers", "create"]
+            }
+          }
+        },
+        {
+          "name": "11 · Q&A · negative · unknown question (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const body = pm.response.json();",
+                  "pm.test('message explains the missing Question', () => pm.expect(body.message).to.contain('Question not found'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": \"does-not-exist\",\n  \"answerId\": \"{{answerTrueId}}\",\n  \"scoreContribution\": 1.0\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questionAndAnswers/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "questionAndAnswers", "create"]
+            }
+          }
+        },
+        {
+          "name": "12 · Q&A · negative · missing answer id (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const body = pm.response.json();",
+                  "pm.test('message asks for answerId', () => pm.expect(body.message).to.contain('answerId is required'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": \"{{questionId}}\",\n  \"scoreContribution\": 1.0\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questionAndAnswers/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "questionAndAnswers", "create"]
+            }
+          }
+        },
+        {
+          "name": "13 · Q&A · delete",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('returns the deleted row', () => pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get('qaId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questionAndAnswers/byId?id={{qaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "questionAndAnswers", "byId"],
+              "query": [{ "key": "id", "value": "{{qaId}}" }]
+            }
+          }
+        },
+        {
+          "name": "14 · Q&A · get deleted (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 Not Found', () => pm.response.to.have.status(404));",
+                  "const body = pm.response.json();",
+                  "pm.test('message says not found', () => pm.expect(body.message).to.contain('not found'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questionAndAnswers/byId?id={{qaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "questionAndAnswers", "byId"],
+              "query": [{ "key": "id", "value": "{{qaId}}" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

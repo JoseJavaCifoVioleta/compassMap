@@ -5,6 +5,8 @@
 ### References
 
 - v1 master doc: [compassMap_v1.md](./compassMap_v1.md)
+- Task 1 implementation + JPA explanation + Postman tests: [task1-qanda.md](./appends/task1-qanda.md)
+- Task 1 fixes and troubleshooting log: [task1-troubleshooting.md](./appends/task1-troubleshooting.md)
 - `JPA` relationships guide: [JPA_Relationships_Guide.md](https://github.com/AlbertProfe/ApartmentPredictor/blob/master/docs/appends/JPA_Relationships_Guide.md)
 - `JPA` annotations (`xml` history): [JPA Before Annotations one-to-many xml](https://github.com/AlbertProfe/ApartmentPredictor/blob/master/docs/appends/JPA_Before_Annotatons:_one-to-many-xml.md)
 - `JPA` concepts `albertprofe` wiki: [DI](https://albertprofe.dev/springboot/boot-concepts-jpa.html) / [Relationships](https://albertprofe.dev/springboot/boot-concepts-jpa-3.html)
@@ -91,6 +93,13 @@ classDiagram
 ### JPA Task 1 — `QuestionAndAnswer`
 
 From plain class to the join entity between `Question` and `Answer`:
+
+> On branch `task1-qanda` this is implemented **without** `assessmentView`:
+> `AssessmentView` is not an `@Entity` yet, so its FK belongs to Task 3. The REST
+> layer uses a flat `QuestionAndAnswerRequest` DTO (`questionId`, `answerId`,
+> `scoreContribution`) because the client only sends ids. See
+> [task1-qanda.md](./appends/task1-qanda.md) for the implemented code, the
+> relationship diagrams and the Postman tests.
 
 ```java
 @Entity
@@ -253,8 +262,8 @@ public class AssessmentView {
 
 Tasks to do:
 
-- [ ] `QuestionAndAnswerRepository` — exists; add `findByAssessmentViewId(...)`
-- [ ] `AnswerRepository` — new, once `Answer` is an entity
+- [ ] `QuestionAndAnswerRepository` — exists; add `findByAssessmentViewId(...)` in Task 3
+- [x] `AnswerRepository` — created with `Answer` as an `@Entity`
 - [ ] `AssessmentViewRepository` — new
 - [ ] `AssessmentViewRestController` — `GET /assessments`, `POST /assessments` (submit questionnaire, compute profile)
 - [ ] `PopulatorDB` — seed questions, answers, roadmaps, profiles, one sample assessment
