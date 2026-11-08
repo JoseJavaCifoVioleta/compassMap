@@ -1,10 +1,15 @@
 package com.example.demo.service;
 
+import com.example.demo.exception.NotFoundException;
 import com.example.demo.model.CustomerProfile;
+import com.example.demo.model.RoadMap;
 import com.example.demo.repository.CustomerProfileRepository;
+import com.example.demo.repository.RoadMapRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,6 +19,9 @@ public class CustomerProfileService {
     // we are using here DEPENDENCE INJECTION
     @Autowired
     private CustomerProfileRepository customerProfileRepository;
+
+    @Autowired
+    private RoadMapRepository roadMapRepository;
 
     public Iterable<CustomerProfile> getAllCustomerProfiles() {
         return customerProfileRepository.findAll();
@@ -88,7 +96,18 @@ public class CustomerProfileService {
         if (incoming.getProfileAnswers() != null) {
             existing.setProfileAnswers(incoming.getProfileAnswers());
         }
-        // to do: recommendedRoadmap once the relationship is enabled
+        if (incoming.getRecommendedRoadmaps() != null) {
+            // roadmaps are shared associations, not created here: resolve each one by id
+            List<RoadMap> resolvedRoadMaps = new ArrayList<>();
+            for (RoadMap roadMap : incoming.getRecommendedRoadmaps()) {
+                if (roadMap == null || roadMap.getId() == null) {
+                    throw new IllegalArgumentException("Recommended roadmap requires an existing roadmap id");
+                }
+                resolvedRoadMaps.add(roadMapRepository.findById(roadMap.getId())
+                        .orElseThrow(() -> new NotFoundException("RoadMap not found: " + roadMap.getId())));
+            }
+            existing.setRecommendedRoadmaps(resolvedRoadMaps);
+        }
         return customerProfileRepository.save(existing);
     }
 }
