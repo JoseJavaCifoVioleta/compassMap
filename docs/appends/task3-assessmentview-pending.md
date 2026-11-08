@@ -64,6 +64,8 @@ c9af397 fix: add orphanRemoval to AssessmentView questionsAndAnswers
 6494bf6 feat: assessmentview-rest-v2.md updated with rebuild list qandas html published  ← master
 ```
 
+> Los Pasos 4 y 5 (opcionales) se descartaron por decisión; el detalle está en la sección 6.2. El Paso 6 es el cierre documental recogido en este mismo documento.
+
 ---
 
 ## 3. Paso 1 — `orphanRemoval` en `AssessmentView`
@@ -326,18 +328,39 @@ También se ejecutó el test de regresión `assessmentViewWithQuestionAndAnswers
 
 ---
 
-## 6. Pendientes y aplazados
+## 6. Cobertura de los puntos pendientes
+
+### 6.1 Puntos completados o ya presentes
+
+| Punto | Origen | Estado | Referencia |
+|---|---|---|---|
+| `orphanRemoval = true` en `AssessmentView.questionsAndAnswers` | `docs/appends/dataModel-v2.md` (nota de la línea 346) | **Hecho** | `c9af397` |
+| Errores del servicio de assessments mapeados a `404`/`400` | `docs/appends/assessmentview-rest-v2.md` (nota de la línea 218) | **Hecho** | `75705a4` |
+| `recommendedRoadmaps` en `updateCustomerProfile` | `CustomerProfileService.java` (comentario `// to do: recommendedRoadmap…`, línea 91 antes del cambio) | **Hecho** | `ba08c69` |
+| `QuestionAndAnswerRepository.findByAssessmentViewId(...)` | `docs/compassMap_v2.md` (checklist, línea 311) | **Ya existía** | Sin cambios |
+| `AssessmentViewRepository` | `docs/compassMap_v2.md` (checklist, línea 313) | **Ya existía** | Sin cambios |
+| `Answer` como `@Entity` | `docs/compassMap_v2.md` (nota de Task 1) | **Ya existía** | Sin cambios |
+
+### 6.2 Puntos no realizados o aplazados
 
 | Punto | Dónde está | Decisión |
 |---|---|---|
+| `findByCustomerId` devuelve `Optional` | `CustomerProfileRepository.java` (línea 10) | **No hecho**: el método del servicio que lo usa no está expuesto en ningún controller. El cambio a `List` no aporta nada hoy y podría rehacerse si cambia el modelo. Queda documentado como limitación conocida. |
+| `AnswerRepository` | `docs/compassMap_v2.md` (checklist, línea 312) | **No hecho**: nadie lo usaría; los `Answer` se guardan por cascada desde `QuestionAndAnswer`. Sería código muerto. |
 | “Submit questionnaire, compute profile” | `docs/compassMap_v2.md` (checklist, línea 314) | **Aplazado** hasta que el modelo y React.js estén claros. Requiere decidir dimensiones, puntuaciones, catálogo de perfiles y contrato de API. |
-| `AnswerRepository` | `docs/compassMap_v2.md` (checklist, línea 312) | **No hacer ahora**: nadie lo usaría; los `Answer` se guardan por cascada. Sería código muerto. |
-| `findByCustomerId` devuelve `Optional` | `CustomerProfileRepository.java` | **Pendiente de decidir**: la Task 2 dice que un cliente puede tener muchos perfiles; con dos, el `Optional` lanzaría `IncorrectResultSizeDataAccessException`. No está expuesto en el controller. |
-| Siembra automática de `PopulatorDB` | `docs/compassMap_v2.md` (checklist, línea 315) | **No hacer ahora**: los métodos existen, pero invocarlos puede duplicar datos o interferir en tests. |
-| `CascadeType.ALL` / `EAGER` en `CustomerProfile.recommendedRoadmaps` | `dataModel-v2.md` (recomendación) | **No tocar**: la Task 2 los pide literalmente. |
+| Siembra automática de `PopulatorDB` | `docs/compassMap_v2.md` (checklist, línea 315) | **No hecho**: los métodos existen, pero invocarlos puede duplicar datos o interferir en tests. |
+| `CascadeType.ALL` / `EAGER` en `CustomerProfile.recommendedRoadmaps` | `dataModel-v2.md` (recomendación, línea 347) | **No tocar**: la Task 2 los pide literalmente. |
 | `Answer` de `@OneToOne` a `@ManyToOne` | Documentación contradictoria | **No tocar**: el documento posterior acepta `@OneToOne`. |
 | Rutas REST antiguas (`GET/POST /assessments`) | Checklist antiguo vs. doc REST v2 | **No tocar**: el documento REST posterior las supera. |
 | DTOs, validación, paginación, `@Transactional`, `@EntityGraph`, N+1 | Notas de “pitfalls” | **No hacer**: mejoras no solicitadas. |
+
+### 6.3 Nota sobre los documentos del autor
+
+Las casillas de `docs/compassMap_v2.md` (líneas 311–315) **no se han marcado** deliberadamente. Ese documento pertenece al autor del proyecto y puede cambiar en cualquier momento; modificarlo desde esta rama aumentaría el riesgo de conflicto sin aportar nada al código.
+
+El estado real queda registrado en **este documento**, que es propio de la rama.
+
+Las únicas excepciones son las notas de `dataModel-v2.md` y `assessmentview-rest-v2.md` actualizadas en los Pasos 1 y 2, que ya están commiteadas y se dejan como están.
 
 ---
 
@@ -395,9 +418,13 @@ La aplicación usa:
 | Dato | Valor |
 |---|---|
 | Rama | `task3-assessmentview-pending` |
-| HEAD | `ba08c69` |
+| HEAD | el commit de este cierre (consultar `git log --oneline -1`) |
 | `master` | `6494bf6` (sin tocar) |
-| Commits nuevos vs `master` | 3 |
-| Árbol de trabajo | limpio |
+| Commits nuevos vs `master` | 5 (incluido este cierre) |
+| Pasos 1–3 | completados |
+| Pasos 4–5 | no realizados por decisión (ver sección 6.2) |
+| Paso 6 | cierre documental en este mismo documento |
+| Árbol de trabajo | limpio antes de este cambio |
 | `push` | no realizado |
 | Base de datos del repo | sin tocar |
+| Documentos del autor | sin nuevos cambios desde el Paso 2 |
