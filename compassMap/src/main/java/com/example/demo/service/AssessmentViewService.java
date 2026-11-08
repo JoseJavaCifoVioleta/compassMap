@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.exception.NotFoundException;
 import com.example.demo.model.AssessmentView;
 import com.example.demo.model.QuestionAndAnswer;
 import com.example.demo.repository.AssessmentViewRepository;
@@ -50,11 +51,11 @@ public class AssessmentViewService {
         // customer and profile are referenced by id, not created here
         if (assessmentView.getCustomer() != null && assessmentView.getCustomer().getId() != null) {
             assessmentView.setCustomer(customerRepository.findById(assessmentView.getCustomer().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Customer not found: " + assessmentView.getCustomer().getId())));
+                    .orElseThrow(() -> new NotFoundException("Customer not found: " + assessmentView.getCustomer().getId())));
         }
         if (assessmentView.getProfile() != null && assessmentView.getProfile().getId() != null) {
             assessmentView.setProfile(customerProfileRepository.findById(assessmentView.getProfile().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("CustomerProfile not found: " + assessmentView.getProfile().getId())));
+                    .orElseThrow(() -> new NotFoundException("CustomerProfile not found: " + assessmentView.getProfile().getId())));
         }
 
         // Rebuild the questionsAndAnswers list using the helper so that both sides of the
@@ -95,7 +96,7 @@ public class AssessmentViewService {
             // Replace the stub Question (only id) with the fully-loaded managed entity
             // so that Hibernate sees a real reference and does not try to insert a new Question
             questionAndAnswer.setQuestion(questionRepository.findById(questionId)
-                    .orElseThrow(() -> new IllegalArgumentException("Question not found: " + questionId)));
+                    .orElseThrow(() -> new NotFoundException("Question not found: " + questionId)));
 
             // Answer is a composition (owned by QuestionAndAnswer) and is therefore created
             // together with the Q&A.  Assign an id if the client did not send one.

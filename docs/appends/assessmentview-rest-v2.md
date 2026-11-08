@@ -215,5 +215,5 @@ With the list rebuilt, a single `assessmentViewRepository.save(assessmentView)` 
   spring.jackson.deserialization.fail-on-null-for-primitives=false
   ```
 
-- **Error handling**: the `IllegalArgumentException`s thrown by the service are not mapped to a `4xx` yet, so an unknown id currently returns `500`.
+- **Error handling**: service errors are now mapped to `4xx` by `RestExceptionHandler` (added by Jose Robles (student) on branch `task3-assessmentview-pending`, not by the project author). A referenced-but-missing customer, profile or question (`NotFoundException`) returns `404`; any other `IllegalArgumentException` (for example, a Q&A without a question id) returns `400`. Both respond with `{"error": "..."}`. `getAssessmentViewById` is unchanged and still returns `null`/`200` when the id does not exist.
 - **Unit test**: `DemoApplicationTests.assessmentViewWithQuestionAndAnswers` covers the same flow without JSON (create, count, score, profile, cascade delete).
