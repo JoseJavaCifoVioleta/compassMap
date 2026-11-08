@@ -38,7 +38,7 @@ public class AssessmentView {
 
     // the assessment owns its Q&A rows: FK assessment_view_id lives in question_and_answer
     // WRITE_ONLY: accepted in POST body, not serialized (use /api/v1/assessments/questionsAndAnswers)
-    @OneToMany(mappedBy = "assessmentView", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "assessmentView", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
