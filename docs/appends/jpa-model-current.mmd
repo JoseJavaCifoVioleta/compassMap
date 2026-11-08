@@ -1,0 +1,118 @@
+%% =====================================================================
+%% CompassMap - modelo JPA actual (rama task3-assessmentview-pending)
+%% Diagrama de clases con la dirección real de las referencias Java.
+%%
+%% Convenciones:
+%%   -->   asociación unidireccional (solo el origen tiene el campo)
+%%   *--   composición (el padre controla el ciclo de vida del hijo)
+%%   ..>   dependencia / uso (enum, @ElementCollection)
+%%   (owning)  lado que tiene la FK o la tabla intermedia
+%%   (mappedBy) lado inverso, solo lectura para el FK
+%% =====================================================================
+
+classDiagram
+    direction TB
+
+    class Customer {
+        <<Entity>>
+        +String id
+        +String firstName
+        +String lastName
+        +String email
+        +String phone
+        +String address
+    }
+
+    class AssessmentView {
+        <<Entity>>
+        +String id
+        +Instant timestamp
+        +int qtyQuestions
+        +List~QuestionAndAnswer~ questionsAndAnswers
+        +addQuestionAndAnswer(QuestionAndAnswer)
+        +removeQuestionAndAnswer(QuestionAndAnswer)
+    }
+
+    class QuestionAndAnswer {
+        <<Entity>>
+        +String id
+        +Double scoreContribution
+        +Question question
+        +Answer answer
+        +AssessmentView assessmentView
+    }
+
+    class Question {
+        <<Entity>>
+        +String id
+        +String name
+        +String text
+        +Dimension dimension
+        +int order
+        +double weight
+    }
+
+    class Answer {
+        <<Entity>>
+        +String id
+        +Boolean value
+        +isCorrect(Boolean) boolean
+    }
+
+    class CustomerProfile {
+        <<Entity>>
+        +String id
+        +CodeProfile codeProfile
+        +String name
+        +String description
+        +String goal
+        +Map~Dimension,Boolean~ profileAnswers
+        +List~RoadMap~ recommendedRoadmaps
+    }
+
+    class RoadMap {
+        <<Entity>>
+        +String id
+        +String name
+        +String description
+        +Map~String,String~ stepsItemsSummary
+        +int steps
+        +boolean completed
+        +List~CustomerProfile~ profiles
+    }
+
+    class CodeProfile {
+        <<enumeration>>
+        BEGINNER
+        ARCHITECT
+        NON_DEVELOPER
+    }
+
+    class Dimension {
+        <<enumeration>>
+        KNOWS_CODE
+        WANTS_TO_LEARN
+        KNOWS_ML
+        WANTS_TO_LEARN_ML
+        KNOWS_GIT
+    }
+
+    %% -------------------- Asociaciones unidireccionales --------------------
+    AssessmentView "*" --> "1" Customer : customer - @ManyToOne - FK customer_id
+    AssessmentView "*" --> "1" CustomerProfile : profile - @ManyToOne - FK customer_profile_id
+    CustomerProfile "*" --> "1" Customer : customer - @ManyToOne - FK customer_id
+    QuestionAndAnswer "*" --> "1" Question : question - @ManyToOne - FK question_id
+
+    %% -------------------- Composición y bidireccionalidad --------------------
+    AssessmentView "1" *-- "*" QuestionAndAnswer : questionsAndAnswers - @OneToMany(mappedBy) - lado inverso
+    QuestionAndAnswer "*" --> "1" AssessmentView : assessmentView - @ManyToOne - owning side, FK assessment_view_id
+    QuestionAndAnswer "1" *-- "0..1" Answer : answer - @OneToOne - cascade ALL + orphanRemoval
+
+    %% -------------------- Muchos a muchos --------------------
+    CustomerProfile "*" --> "*" RoadMap : recommendedRoadmaps - @ManyToMany - owning side, join table
+    RoadMap "*" --> "*" CustomerProfile : profiles - @ManyToMany(mappedBy) - lado inverso
+
+    %% -------------------- Enums y colecciones de básicos --------------------
+    CustomerProfile ..> CodeProfile : codeProfile - @Enumerated(STRING)
+    Question ..> Dimension : dimension - @Enumerated(STRING)
+    CustomerProfile ..> Dimension : profileAnswers key - @ElementCollection
