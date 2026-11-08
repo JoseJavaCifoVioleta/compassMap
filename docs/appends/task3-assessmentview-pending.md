@@ -413,17 +413,97 @@ La aplicación usa:
 
 ---
 
-## 9. Estado actual
+## 9. Revisión previa al push
+
+> Revisión realizada el 2026-11-08, antes de publicar la rama en GitHub.
+
+### 9.1. Comprobaciones
+
+| Comprobación | Resultado |
+|---|---|
+| Rama | `task3-assessmentview-pending` |
+| Respecto a `origin/master` | `0` detrás / `7` delante (antes de este cambio) |
+| Árbol de trabajo | limpio |
+| Rama remota | todavía no existe en `origin` |
+| Ficheros cambiados | 5 de código + 6 de documentación |
+| Compilación | correcta (33 fuentes) |
+| Test de regresión | `DemoApplicationTests#assessmentViewWithQuestionAndAnswers`: 1 test, 0 fallos |
+| `master` | sin tocar (`6494bf6`) |
+| CI / GitHub Actions | no hay workflows |
+| Secretos o `db/` | sin cambios nuevos |
+
+### 9.2. Documentos del autor
+
+Siguen modificados dos documentos del autor, con **una línea cambiada en cada uno**:
+
+- `docs/appends/dataModel-v2.md`
+- `docs/appends/assessmentview-rest-v2.md`
+
+Los cambios están atribuidos explícitamente a Jose Robles (student) y limitados a las notas de `orphanRemoval` y del manejo de errores.
+
+No son bloqueantes. Si el autor actualiza esos documentos, puede aparecer un conflicto pequeño al hacer merge o PR. Como ya están aprobados y commiteados, no se revierten.
+
+### 9.3. Suite de tests
+
+`DemoApplicationTests` **no es una buena puerta de calidad completa** porque es stateful y destructiva:
+
+- `javaFakerCreateObjects` crea 1.000 clientes.
+- `deleteCustomerById` borra un cliente con id fijo.
+- `questionAndAnswerTentative` depende de una pregunta con id fijo.
+- `roadMapAndCustomerProfile` inserta roadmaps y perfiles `P01..P04`.
+- Todos escriben en la base de datos real configurada.
+
+Por eso **no se ejecuta `mvn test` completo antes del push**. El test `assessmentViewWithQuestionAndAnswers` sí es autónomo, limpia lo que crea y ha pasado.
+
+Mejora futura, fuera del alcance de esta rama: tests con base de datos en memoria, fixtures propios y limpieza o rollback.
+
+### 9.4. Pendientes funcionales
+
+Siguen fuera de esta rama, tal como se decidió en la sección 6.2:
+
+- cálculo automático del perfil a partir de las respuestas;
+- `AnswerRepository`;
+- siembra automática de `PopulatorDB`;
+- `findByCustomerId` devolviendo `Optional` en perfiles;
+- frontend React.
+
+Deben abordarse en otra rama cuando el modelo y React estén claros.
+
+### 9.5. Nombre de la rama
+
+La rama se llama `task3-assessmentview-pending`, pero contiene trabajo de Task 1, Task 2, Task 3 y documentación. No se renombra: cambiarlo ahora rompe la trazabilidad de los commits y de esta bitácora.
+
+### 9.6. Push propuesto
+
+```powershell
+git push -u origin task3-assessmentview-pending
+```
+
+Efectos:
+
+- crea la rama en `https://github.com/JoseJavaCifoVioleta/compassMap`;
+- deja `master` intacto;
+- configura el seguimiento local de la rama.
+
+Después se puede abrir un PR contra:
+
+- `JoseJavaCifoVioleta/compassMap:master`, o
+- `AlbertProfe/compassMap:master`.
+
+---
+
+## 10. Estado actual
 
 | Dato | Valor |
 |---|---|
 | Rama | `task3-assessmentview-pending` |
 | HEAD | el commit de este cierre (consultar `git log --oneline -1`) |
 | `master` | `6494bf6` (sin tocar) |
-| Commits nuevos vs `master` | 5 (incluido este cierre) |
+| Commits nuevos vs `master` | 8 (incluidos los commits de documentación) |
 | Pasos 1–3 | completados |
 | Pasos 4–5 | no realizados por decisión (ver sección 6.2) |
 | Paso 6 | cierre documental en este mismo documento |
+| Revisión previa al push | completada (sección 9) |
 | Árbol de trabajo | limpio antes de este cambio |
 | `push` | no realizado |
 | Base de datos del repo | sin tocar |
